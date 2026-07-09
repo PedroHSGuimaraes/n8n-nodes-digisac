@@ -1,0 +1,66 @@
+{
+  "name": "n8n-nodes-digisac",
+  "version": "1.0.0",
+  "description": "n8n community node for the Digisac API: contacts, tickets, messages, campaigns, services, departments, users, tags, schedules, webhooks, reports and every documented Postman endpoint. Usable as an AI Agent tool.",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "digisac",
+    "diasac",
+    "whatsapp",
+    "crm",
+    "tickets",
+    "contacts",
+    "messages",
+    "automation"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac#readme",
+  "author": {
+    "name": "Pedro Henrique Santos Guimaraes",
+    "email": "pedro.guimaraes02@hotmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PedroHSGuimaraes/n8n-nodes-digisac.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/issues"
+  },
+  "main": "dist/nodes/Digisac/Digisac.node.js",
+  "scripts": {
+    "build": "npm run generate:endpoints && tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials scripts package.json README.md --write",
+    "generate:endpoints": "node scripts/generate-endpoints.mjs",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/DigisacApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Digisac/Digisac.node.js"
+    ]
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "devDependencies": {
+    "@n8n/eslint-plugin-community-nodes": "^0.23.0",
+    "@n8n/node-cli": "^0.38.8",
+    "@types/node": "^18.19.0",
+    "eslint": "^9.29.0",
+    "gulp": "^4.0.2",
+    "n8n-workflow": "^2.16.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.63.0"
+  }
+}
