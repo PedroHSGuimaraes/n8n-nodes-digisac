@@ -67,10 +67,13 @@ function endpointsForResource(resource: string): DigisacEndpointDefinition[] {
 export const resourceOptions: INodePropertyOptions[] = resourceIds
 	.map((resource) => {
 		const first = endpointsForResource(resource)[0];
+		const groupGuidance = first.resourceName.includes('(Popular)')
+			? 'Popular = atalho herdado da colecao Postman para operacoes frequentes; prefira para fluxos comuns quando a operacao desejada estiver aqui.'
+			: 'General = catalogo mais completo da pasta Postman; use quando precisar de uma operacao que nao aparece em Popular.';
 		return {
 			name: first.resourceName,
 			value: resource,
-			description: `${first.resourceDescription} Includes ${endpointsForResource(resource).length} documented API call(s).`,
+			description: `Pasta da documentacao Digisac: ${first.resourceName}. ${groupGuidance} Contem ${endpointsForResource(resource).length} chamada(s) documentadas. Escolha este recurso somente quando a tarefa do usuario corresponder a essa area da API.`,
 		};
 	})
 	.sort((a, b) => a.name.localeCompare(b.name));
@@ -174,38 +177,185 @@ function queryPlaceholder(entry: QueryEntry): string | undefined {
 	return isIdentifier(variable) ? undefined : variable;
 }
 
+function isIdLikeName(value: string): boolean {
+	return /(^id$|ids?$)/i.test(String(value ?? '').replace(/[^A-Za-z0-9]/g, ''));
+}
+
+function isDateLikeName(value: string): boolean {
+	const normalized = String(value ?? '')
+		.replace(/[^A-Za-z0-9]/g, '')
+		.toLowerCase();
+	return (
+		['from', 'to', 'start', 'end'].includes(normalized) ||
+		/(date|period|createdat|endedat|scheduledat|timestamp)$/.test(normalized) ||
+		/(startperiod|endperiod|startedat|closedat|updatedat)/.test(normalized)
+	);
+}
+
+function enumChoicesFromValue(value: string): string[] {
+	const choices = new Set<string>();
+	for (const variable of templateVariables(value)) {
+		if (!variable.includes('/')) continue;
+		for (const choice of variable.split('/')) {
+			const cleaned = choice.trim();
+			if (cleaned) choices.add(cleaned);
+		}
+	}
+	return [...choices];
+}
+
+function querySpecificGuidance(entry: QueryEntry): string {
+	const parts: string[] = [];
+	const choices = enumChoicesFromValue(entry.value);
+	if (choices.length) {
+		const enumPlaceholder = templateVariables(entry.value).find((variable) => variable.includes('/'));
+		parts.push(
+			`A documentacao sugere alternativas: ${choices.join(', ')}. Escolha uma opcao real; nao envie o placeholder literal "${enumPlaceholder}".`,
+		);
+	}
+	if (isIdLikeName(entry.key) || entry.variables.some(isIdLikeName)) {
+		parts.push(
+			'Se este valor for um ID, use somente ID real retornado pela Digisac ou confirmado pelo usuario; nao invente.',
+		);
+	}
+	if (isDateLikeName(entry.key) || entry.variables.some(isDateLikeName)) {
+		parts.push('Para data/hora, use formato ISO-8601 quando a API esperar timestamp.');
+	}
+	if (/^(where|filters|query|include)/i.test(entry.key)) {
+		parts.push('Este campo monta filtro/include da API; preserve a estrutura documentada e altere somente o valor solicitado.');
+	}
+	return parts.join(' ');
+}
+
+function operationRiskGuidance(endpoint: DigisacEndpointDefinition): string {
+	if (endpoint.method === 'GET') {
+		return 'Operacao de leitura: use para consultar dados. Se precisar de um ID para outra acao, prefira esta operacao antes de escrever dados.';
+	}
+	if (endpoint.method === 'DELETE') {
+		return 'Operacao destrutiva DELETE: use somente quando o usuario pediu explicitamente exclusao/remocao e os IDs foram confirmados.';
+	}
+	if (['POST', 'PUT', 'PATCH'].includes(endpoint.method)) {
+		return 'Operacao de escrita/acao: pode criar, alterar, enviar, transferir, fechar, arquivar ou disparar algo na Digisac. Use somente com intencao clara do usuario e IDs confirmados.';
+	}
+	return 'Operacao documentada pela Digisac.';
+}
+
+function queryEntrySummary(entry: QueryEntry): string {
+	const template = entry.value ? ` template "${compactDescription(entry.value, 90)}"` : '';
+	return `${entry.displayName} -> ${entry.key}${template}`;
+}
+
+function queryGuidance(entries: QueryEntry[]): string {
+	if (!entries.length) return '';
+
+	const simple = entries.filter((entry) => entry.showField).map(queryEntrySummary);
+	const complex = entries.filter((entry) => entry.isComplex);
+	const staticOnly = entries.filter((entry) => !entry.showField && !entry.isComplex);
+	const parts: string[] = [];
+
+	if (simple.length) {
+		parts.push(`Campos de query disponiveis: ${simple.join('; ')}.`);
+	}
+	if (complex.length) {
+		const variables = [...new Set(complex.flatMap((entry) => entry.variables))];
+		parts.push(
+			`Query complexa documentada: preencha as variaveis ${variables.join(', ')} quando souber; se faltar uma variavel, essa query complexa e omitida para evitar placeholder falso.`,
+		);
+	}
+	if (staticOnly.length) {
+		parts.push(
+			`Filtros estaticos da documentacao aplicados automaticamente: ${staticOnly.map((entry) => `${entry.key}=${compactDescription(entry.value, 70)}`).join('; ')}.`,
+		);
+	}
+
+	return parts.join(' ');
+}
+
+function bodyTypeLabel(type: BodyFieldType): string {
+	if (type === 'json') return 'JSON valido';
+	if (type === 'boolean') return 'booleano';
+	if (type === 'number') return 'numero';
+	return 'texto';
+}
+
+function bodyFieldSpecificGuidance(field: BodyFieldDefinition): string {
+	const normalizedKey = field.key.toLowerCase();
+	const parts: string[] = [];
+
+	if (isIdLikeName(field.key)) {
+		parts.push(
+			'ID ou lista de IDs: use somente valores reais da Digisac, vindos de busca/listagem anterior ou confirmados pelo usuario. Nao invente.',
+		);
+	}
+	if (field.type === 'json') {
+		parts.push(
+			'Informe JSON valido sem comentarios e sem placeholders {{...}}. Para lista use array [...]; para objeto use {...}.',
+		);
+	}
+	if (['file', 'files'].includes(normalizedKey)) {
+		parts.push(
+			'Para arquivo, use objeto com base64, mimetype e name; em arrays, envie lista desses objetos. Nao coloque o body inteiro dentro deste campo.',
+		);
+	}
+	if (normalizedKey === 'parameters') {
+		parts.push(
+			'Parametros de template/HSM devem seguir exatamente a estrutura esperada pelo template escolhido; nao invente variaveis ou indices.',
+		);
+	}
+	if (normalizedKey === 'events') {
+		parts.push('Eventos devem ser nomes aceitos/configurados pela Digisac para webhook; nao invente eventos.');
+	}
+	if (normalizedKey === 'where' || normalizedKey === 'query') {
+		parts.push('Filtro/query estruturado: altere somente valores conhecidos e preserve a estrutura documentada.');
+	}
+	if (isDateLikeName(field.key)) {
+		parts.push('Para data/hora, use ISO-8601 ou o formato exato que a operacao Digisac documenta.');
+	}
+
+	return parts.join(' ');
+}
+
+function bodyFieldsSummary(fields: BodyFieldDefinition[]): string {
+	if (!fields.length) return '';
+	return fields
+		.map((field) => `${toTitle(field.key)} (${bodyTypeLabel(field.type)})`)
+		.join('; ');
+}
+
 function operationDescription(endpoint: DigisacEndpointDefinition): string {
 	const entries = queryEntriesByOperation.get(endpoint.id) ?? [];
 	const bodyFields = bodyFieldsByOperation.get(endpoint.id) ?? [];
 	const parts = [
-		`${endpoint.method} ${endpoint.pathTemplate || endpoint.rawUrl}.`,
-		`Source: ${endpoint.sourcePath}.`,
+		`Chamada Digisac documentada: ${endpoint.method} ${endpoint.pathTemplate || endpoint.rawUrl}.`,
+		`Use quando a tarefa do usuario corresponder a "${endpoint.operationName}".`,
+		'Se houver outra operacao com o mesmo endpoint, escolha pelo nome/efeito da Operation, nao apenas pelo metodo e path.',
+		operationRiskGuidance(endpoint),
+		`Origem Postman: ${endpoint.sourcePath}.`,
 	];
 
 	if (endpoint.pathParams.length) {
-		parts.push(`Required path parameters: ${endpoint.pathParams.join(', ')}.`);
-	}
-	if (entries.length) {
 		parts.push(
-			'Query parameters are exposed as simple fields when useful; documented static filters are applied automatically.',
+			`Parametros de path obrigatorios: ${endpoint.pathParams.join(', ')}. Use valores reais retornados pela Digisac; nunca invente IDs.`,
 		);
 	}
-	if (endpoint.queryParams.length) {
-		parts.push(`Documented query placeholders: ${endpoint.queryParams.join(', ')}.`);
-	}
-	if (endpoint.queryTemplate) {
-		parts.push(`Documented query template: ${compactDescription(endpoint.queryTemplate, 260)}.`);
+	const queryDescription = queryGuidance(entries);
+	if (queryDescription) {
+		parts.push(queryDescription);
 	}
 	if (endpoint.hasBody && bodyFields.length) {
 		parts.push(
-			'Fill Campos do Body first. Use Body JSON Avancado only for payloads that need a custom structure not covered by the generated fields.',
+			`Campos do Body gerados: ${bodyFieldsSummary(bodyFields)}. Preencha somente os campos necessarios; campos vazios nao sao enviados. Use Body JSON Avancado somente se essa lista nao cobrir a estrutura necessaria.`,
 		);
 	}
 	if (endpoint.hasBody && !bodyFields.length && endpoint.bodyExample.trim()) {
-		parts.push('This operation needs Body JSON because the documented payload is an array or a custom object.');
+		parts.push(
+			`Esta operacao usa Body JSON porque a documentacao mostra array, objeto livre ou instrucao textual. Use JSON valido e siga a orientacao da documentacao: ${compactDescription(endpoint.bodyExample, 240)}.`,
+		);
 	}
 	if (endpoint.absoluteUrlVariable) {
-		parts.push('This operation calls the absolute webhook URL supplied in the operation field.');
+		parts.push(
+			'Esta operacao chama uma URL absoluta de webhook/teste. Use somente URLs confiaveis e diretamente fornecidas pelo usuario ou workflow.',
+		);
 	}
 
 	return parts.join(' ');
@@ -228,7 +378,7 @@ function operationProperties(): INodeProperties[] {
 			})),
 			default: endpoints[0]?.id ?? '',
 			description:
-				'The exact Digisac API call from the selected Postman folder. Descriptions include method, path, required path variables and query/body guidance for AI Agents.',
+				'Chamada exata da API Digisac. Leia a descricao de cada option antes de escolher: ela informa quando usar, metodo HTTP, endpoint, parametros obrigatorios, query, body e cuidados para nao inventar IDs.',
 		};
 	});
 }
@@ -242,7 +392,7 @@ function pathParameterProperties(): INodeProperties[] {
 			required: true,
 			default: '',
 			displayOptions: { show: { operation: [endpoint.id] } },
-			description: `Required path parameter "{{${parameter}}}" for ${endpoint.method} ${endpoint.pathTemplate}. Use the exact ID/value returned by Digisac; do not invent this value.`,
+			description: `Parametro obrigatorio "{{${parameter}}}" no path de ${endpoint.method} ${endpoint.pathTemplate}. Use exatamente o ID/valor retornado pela Digisac em uma busca/listagem anterior ou informado pelo usuario. Se nao tiver certeza, busque antes; nao invente.`,
 		})),
 	);
 }
@@ -258,7 +408,7 @@ function queryFieldProperties(): INodeProperties[] {
 				default: queryDefault(entry),
 				placeholder: queryPlaceholder(entry),
 				displayOptions: { show: { operation: [endpoint.id] } },
-				description: `Optional query parameter "${entry.key}" for ${endpoint.method} ${endpoint.pathTemplate}. Leave empty to omit it. Static defaults come from the Digisac Postman documentation.`,
+				description: `Parametro de query opcional "${entry.key}" para ${endpoint.method} ${endpoint.pathTemplate}. Template documentado: "${compactDescription(entry.value || '(valor livre)', 120)}". Deixe vazio para omitir. ${querySpecificGuidance(entry)} Nao copie placeholders da documentacao; substitua por valor real.`,
 			})),
 	);
 
@@ -275,7 +425,7 @@ function queryFieldProperties(): INodeProperties[] {
 			default: '',
 			placeholder: isIdentifier(variable) ? undefined : variable,
 			displayOptions: { show: { operation: [endpoint.id] } },
-			description: `Value used to replace "{{${variable}}}" inside the documented complex query for ${endpoint.method} ${endpoint.pathTemplate}. Leave empty to omit this complex query instead of sending unresolved placeholders.`,
+			description: `Valor que substitui "{{${variable}}}" dentro da query JSON complexa documentada para ${endpoint.method} ${endpoint.pathTemplate}. Preencha somente se tiver o valor real. Se faltar, o node omite a query complexa para nao enviar placeholder inventado. ${enumChoicesFromValue(`{{${variable}}}`).length ? `Escolha uma destas opcoes: ${enumChoicesFromValue(`{{${variable}}}`).join(', ')}; nao envie "${variable}" literal.` : ''}`,
 		}));
 	});
 
@@ -291,7 +441,7 @@ function absoluteUrlProperties(): INodeProperties[] {
 		default: '',
 		displayOptions: { show: { operation: [endpoint.id] } },
 		description:
-			'Full URL to call for this documented operation. Used by the Postman collection for webhook test calls that are outside the normal Digisac Base URL.',
+			'URL completa chamada por esta operacao documentada, fora da Base URL normal da Digisac. Use somente URL confiavel fornecida pelo usuario, pela propria Digisac ou pelo workflow.',
 	}));
 }
 
@@ -505,13 +655,13 @@ function bodyFieldProperties(): INodeProperties[] {
 				default: bodyFieldsDefault(fields) as INodeProperties['default'],
 				displayOptions: { show: { operation: [endpoint.id], useRawBodyJson: [false] } },
 				description:
-					'Campos gerados a partir do body documentado pela Digisac. Preencha somente os campos necessarios; valores vazios nao sao enviados.',
+					'Campos gerados a partir do body documentado pela Digisac. Para AI Agents: use estes campos antes de JSON manual; preencha somente dados que o usuario informou ou que vieram de uma busca anterior; valores vazios nao sao enviados.',
 				options: fields.map((field): INodeProperties => ({
 					displayName: toTitle(field.key),
 					name: field.key,
 					type: field.type,
 					default: field.defaultValue,
-					description: `Campo "${field.key}" do body para ${endpoint.method} ${endpoint.pathTemplate}. Exemplo da documentacao: ${compactDescription(field.sample, 180)}.`,
+					description: `Campo "${field.key}" do body para ${endpoint.method} ${endpoint.pathTemplate}. Tipo esperado: ${bodyTypeLabel(field.type)}. Exemplo da documentacao: ${compactDescription(field.sample, 180)}. ${bodyFieldSpecificGuidance(field)} Deixe vazio para omitir quando nao souber.`,
 				})),
 			};
 		},
@@ -529,7 +679,7 @@ function useRawBodyProperties(): INodeProperties[] {
 			default: false,
 			displayOptions: { show: { operation: bodyFieldOperationIds } },
 			description:
-				'Enable only when the generated Campos do Body are not enough and you need to send a custom JSON object or array.',
+				'Ative somente quando os Campos do Body nao cobrirem a estrutura exigida pela Digisac. Para AI Agents, prefira campos dedicados; JSON avancado substitui todos os Campos do Body.',
 		},
 	];
 }
@@ -546,7 +696,7 @@ function rawBodyProperties(): INodeProperties[] {
 			type: 'json',
 			default: rawBodyDefault(endpoint),
 			displayOptions: { show: { operation: [endpoint.id] } },
-			description: `JSON enviado no body de ${endpoint.method} ${endpoint.pathTemplate}. A documentacao desta operacao usa array, objeto livre ou instrucao textual, entao nao foi possivel gerar campos simples com seguranca.`,
+			description: `JSON enviado no body de ${endpoint.method} ${endpoint.pathTemplate}. A documentacao desta operacao usa array, objeto livre ou instrucao textual, entao nao foi possivel gerar campos simples com seguranca. Use JSON valido, minimo e baseado em dados reais; remova comentarios e substitua qualquer placeholder {{...}} por valor real. Orientacao documentada: ${compactDescription(endpoint.bodyExample, 320)}.`,
 		}),
 	);
 
@@ -558,7 +708,7 @@ function rawBodyProperties(): INodeProperties[] {
 			default: rawBodyDefault(endpoint),
 			displayOptions: { show: { operation: [endpoint.id], useRawBodyJson: [true] } },
 			description:
-				'JSON completo que substitui os Campos do Body desta operacao. Use somente quando precisar enviar uma estrutura customizada.',
+				'JSON completo que substitui os Campos do Body desta operacao. Use somente quando precisar enviar uma estrutura customizada que os campos dedicados nao suportam. O JSON deve ser valido e conter apenas dados confirmados.',
 		}),
 	);
 
@@ -588,17 +738,17 @@ export const resourceProperties: INodeProperties[] = [
 					{
 						name: 'JSON',
 						value: 'json',
-						description: 'Parse response as JSON. Best for normal Digisac API operations.',
+						description: 'Ler resposta como JSON. Use na maioria das chamadas normais da API Digisac.',
 					},
 					{
 						name: 'Text',
 						value: 'text',
-						description: 'Return response as text. Useful for CSV/TXT/PDF export endpoints.',
+						description: 'Retornar resposta como texto. Use em exportacoes CSV/TXT/PDF ou quando a resposta nao for JSON.',
 					},
 				],
 				default: 'json',
 				description:
-					'How to read the response. Use Text for export endpoints if the response is not JSON.',
+					'Formato de leitura da resposta. Para AI Agents: escolha Text apenas em exportacoes ou respostas nao JSON; mantenha JSON nas consultas e escritas comuns.',
 			},
 			{
 				displayName: 'Query Avancada JSON',
@@ -606,7 +756,7 @@ export const resourceProperties: INodeProperties[] = [
 				type: 'json',
 				default: '{}',
 				description:
-					'Advanced escape hatch. Optional JSON object merged into the query string after the generated fields. Use only when the API needs a query parameter that is not represented by a field.',
+					'Objeto JSON opcional mesclado na query string depois dos campos gerados. Chaves iguais substituem os valores dos campos gerados. Use somente quando a Digisac exigir filtro/query sem campo dedicado. Nao use para path nem body; nao use para IDs/datas se houver campo dedicado; nao invente filtros, chaves ou IDs.',
 			},
 		],
 	},

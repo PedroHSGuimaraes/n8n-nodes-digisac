@@ -119,7 +119,7 @@ O projeto segue o mesmo padrão usado no \`n8n-nodes-clinicorp\`: um node de aç
 - **Cobertura completa da documentação**: ${endpoints.length} chamadas da coleção pública Postman da Digisac, organizadas em ${groups.length} recursos no n8n.
 - **Node único e intuitivo**: selecione **Resource -> Operation**, preencha campos simples de path, query e body, e execute.
 - **Credencial centralizada**: Base URL e Bearer Token ficam salvos uma única vez na credencial \`Digisac API\`.
-- **Pronto para AI Agent**: o node tem \`usableAsTool: true\` e descrições pensadas para LLMs entenderem método, caminho, parâmetros, IDs, filtros, campos de body e quando usar JSON avançado.
+- **Pronto para AI Agent**: o node tem \`usableAsTool\` com descrição específica de ferramenta e textos pensados para LLMs entenderem método, caminho, efeito da operação, parâmetros, regra de IDs, filtros, campos de body e quando usar JSON avançado.
 - **Sem dependências runtime**: usa \`httpRequestWithAuthentication\` do próprio n8n.
 - **Catálogo rastreável**: \`nodes/Digisac/generated/endpoints.ts\` é gerado da documentação Postman; \`docs/api-calls.md\` lista todas as chamadas em português.
 - **Publicação segura**: GitHub Actions publica no npm com provenance.
@@ -168,6 +168,10 @@ GET /api/v1/me
 8. Use **Options -> Query Avançada JSON** somente para filtros muito específicos não representados por campos.
 9. Em exports CSV/TXT/PDF, se a resposta não vier como JSON, use **Options -> Response Format -> Text**.
 
+Resources marcados como **Popular** são atalhos herdados da coleção Postman para operações frequentes. Resources **General** contêm o catálogo mais completo. Se a mesma chamada existir nos dois, use **Popular** para fluxos comuns e **General** quando precisar de uma operação que não aparece em Popular.
+
+Regra para AI Tools e automações: qualquer campo terminado em \`Id\` ou \`Ids\` deve vir de busca/listagem anterior, entrada confirmada do usuário ou valor sentinela documentado, como \`all\`. Nunca copie placeholders como \`{{contactId}}\`, \`{{serviceId}}\` ou \`{{all/open/close}}\`.
+
 ## Campos principais do node
 
 | Campo | Uso |
@@ -178,7 +182,7 @@ GET /api/v1/me
 | **Campos de query** | Campos simples gerados a partir da URL documentada. Exemplos: \`Per Page\`, \`Number\`, \`Service Id\`, \`From\`, \`To\`, \`Type\`. |
 | **Campos do Body** | Coleção de campos gerada a partir do body documentado para operações de escrita. Use antes de qualquer JSON manual. |
 | **Use Body JSON Avançado** | Toggle para liberar um editor JSON quando a chamada precisa de array, objeto livre ou payload muito específico. |
-| **Options -> Query Avançada JSON** | Objeto JSON livre mesclado na query string. Use apenas quando a chamada precisar de filtro não representado por campo. |
+| **Options -> Query Avançada JSON** | Objeto JSON livre mesclado na query string. Chaves iguais substituem campos gerados; use apenas quando a chamada precisar de filtro não representado por campo. |
 | **Options -> Response Format** | Use \`Text\` para exportações CSV/TXT/PDF ou respostas que não retornam JSON. |
 
 ## Exemplos práticos
@@ -220,18 +224,13 @@ Em **Campos do Body**, preencha:
 Resource: **Mensagens (General)**  
 Operation: **Enviar imagem**, **Enviar PDF** ou **Enviar áudio**
 
-Use **Campos do Body** para \`Text\`, \`Number\` e \`Service Id\`. No campo \`File\`, informe um JSON com base64, mimetype e nome:
+Use **Campos do Body** para \`Text\`, \`Number\` e \`Service Id\`. No campo \`File\`, informe somente o objeto do arquivo, não o body inteiro:
 
 \`\`\`json
 {
-  "type": "file",
-  "contactId": "CONTACT_ID",
-  "serviceId": "SERVICE_ID",
-  "file": {
-    "base64": "BASE64_DO_ARQUIVO",
-    "mimetype": "application/pdf",
-    "name": "documento.pdf"
-  }
+  "base64": "BASE64_DO_ARQUIVO",
+  "mimetype": "application/pdf",
+  "name": "documento.pdf"
 }
 \`\`\`
 
@@ -319,7 +318,8 @@ O node pode ser conectado ao **AI Agent** do n8n como uma tool. A prática recom
 
 \`\`\`text
 Você pode usar as tools Digisac somente quando o usuário pedir para consultar, criar ou alterar dados na Digisac.
-Nunca invente IDs. Se faltar contactId, ticketId, departmentId, serviceId, userId, messageId, tagId, campaignId ou templateId, primeiro use uma operação de listagem ou busca.
+Nunca invente IDs. Qualquer campo terminado em Id ou Ids deve vir de busca/listagem anterior, entrada confirmada do usuário ou valor sentinela documentado como all.
+Não copie placeholders da documentação, como {{contactId}}, {{serviceId}} ou {{all/open/close}}. Substitua por valor real ou escolha uma opção válida.
 Para operações POST, PUT e PATCH, envie um body JSON mínimo, somente com os campos necessários.
 Quando a tool expuser Campos do Body, preencha os campos dedicados em vez de gerar um JSON manual.
 Use Body JSON Avançado ou Query Avançada JSON apenas quando não existir campo dedicado suficiente para a chamada.
@@ -437,6 +437,7 @@ npm publish --provenance --access public
 
 ## Versões
 
+- **1.0.3** — Descrições de AI Tool reforçadas: regra genérica para campos \`Id/Ids\`, alertas para placeholders, orientação Popular vs General, avisos por tipo de campo de body/query e exemplo de arquivo corrigido.
 - **1.0.2** — Interface simplificada: query e body agora usam campos dedicados gerados da documentação. JSON fica escondido em opções avançadas ou aparece apenas nas chamadas em que não há forma segura de gerar campos. Ícone atualizado a partir de \`icon.webp\`.
 - **1.0.1** — Documentação reescrita em PT-BR, com exemplos práticos, instruções de AI Tool e catálogo completo de chamadas em \`docs/api-calls.md\`.
 - **1.0.0** — Primeira versão publicada. Node único \`Digisac\`, credencial Bearer, catálogo com ${endpoints.length} chamadas da documentação Postman, suporte a AI Agent e publicação npm via GitHub Actions.
