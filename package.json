@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-digisac",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "n8n community node for the Digisac API: contacts, tickets, messages, campaigns, services, departments, users, tags, schedules, webhooks, reports and every documented Postman endpoint. Usable as an AI Agent tool.",
   "keywords": [
     "n8n-community-node-package",
@@ -33,12 +33,14 @@
     "dev": "tsc --watch",
     "format": "prettier nodes credentials scripts package.json README.md --write",
     "generate:endpoints": "node scripts/generate-endpoints.mjs",
+    "generate:docs": "node scripts/generate-docs.mjs",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,

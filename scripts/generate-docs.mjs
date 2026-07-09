@@ -1,34 +1,142 @@
-# n8n-nodes-digisac
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+
+const ENDPOINTS_FILE = path.resolve('nodes', 'Digisac', 'generated', 'endpoints.ts');
+const README_FILE = path.resolve('README.md');
+const API_DOC_FILE = path.resolve('docs', 'api-calls.md');
+
+function escapeCell(value) {
+	return String(value ?? '')
+		.replace(/\r?\n/g, ' ')
+		.replace(/\|/g, '\\|')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+async function loadEndpoints() {
+	const source = await readFile(ENDPOINTS_FILE, 'utf8');
+	const match = source.match(/export const DIGISAC_ENDPOINTS: DigisacEndpointDefinition\[] = ([\s\S]*);\n?$/);
+	if (!match) {
+		throw new Error(`Could not find DIGISAC_ENDPOINTS in ${ENDPOINTS_FILE}`);
+	}
+	return JSON.parse(match[1]);
+}
+
+function groupEndpoints(endpoints) {
+	const groups = new Map();
+	for (const endpoint of endpoints) {
+		const key = endpoint.resourceName;
+		if (!groups.has(key)) groups.set(key, []);
+		groups.get(key).push(endpoint);
+	}
+	return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
+}
+
+function methodSummary(endpoints) {
+	const counts = new Map();
+	for (const endpoint of endpoints) {
+		counts.set(endpoint.method, (counts.get(endpoint.method) ?? 0) + 1);
+	}
+	return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+		.map((method) => `${method}: ${counts.get(method) ?? 0}`)
+		.join(' | ');
+}
+
+function operationRows(endpoints) {
+	return endpoints
+		.map((endpoint) => {
+			const params = [
+				...endpoint.pathParams.map((param) => `path:${param}`),
+				...endpoint.queryParams.map((param) => `query:${param}`),
+			].join(', ');
+			return `| \`${endpoint.id}\` | \`${endpoint.method}\` | \`${escapeCell(endpoint.pathTemplate || endpoint.rawUrl)}\` | ${escapeCell(endpoint.operationName)} | ${escapeCell(params || '-')} |`;
+		})
+		.join('\n');
+}
+
+function groupSummaryRows(groups) {
+	return groups
+		.map(([name, endpoints]) => `| ${escapeCell(name)} | ${endpoints.length} |`)
+		.join('\n');
+}
+
+function apiDoc(endpoints, groups) {
+	const sections = groups
+		.map(
+			([name, items]) => `## ${name}
+
+| ID | Método | Caminho | Operação | Parâmetros detectados |
+| --- | --- | --- | --- | --- |
+${operationRows(items)}
+`,
+		)
+		.join('\n');
+
+	return `# Catálogo completo de chamadas Digisac
+
+Este arquivo é gerado a partir da coleção pública Postman da Digisac e lista todas as chamadas incluídas no node n8n.
+
+Fonte da API:
+
+\`\`\`text
+https://documenter.getpostman.com/view/53282970/2sBXihpXmF
+\`\`\`
+
+Resumo:
+
+- Total de chamadas documentadas: ${endpoints.length}
+- Total de recursos/pastas no node: ${groups.length}
+- Métodos: ${methodSummary(endpoints)}
+
+## Como ler esta tabela
+
+- **ID** é o identificador interno da operação no node. Ele aparece apenas no código gerado; na interface do n8n o usuário escolhe pelo nome da operação.
+- **Método** é o verbo HTTP usado pela API.
+- **Caminho** é o endpoint chamado após a Base URL configurada na credencial.
+- **Operação** é o nome herdado da documentação Postman.
+- **Parâmetros detectados** mostra placeholders encontrados em path e query. IDs devem vir de operações de listagem/busca, nunca de valores inventados.
+
+## Resumo por recurso
+
+| Recurso | Chamadas |
+| --- | ---: |
+${groupSummaryRows(groups)}
+
+${sections}`;
+}
+
+function readme(endpoints, groups) {
+	return `# n8n-nodes-digisac
 
 [![CI](https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/actions/workflows/ci.yml)
 
 Node community do [n8n](https://n8n.io/) para integrar workflows com a **API da Digisac**. O pacote expõe em um único node todas as chamadas publicadas na documentação Postman da Digisac: contatos, chamados, mensagens, campanhas, conexões, departamentos, usuários, tags, templates, webhooks, relatórios, estatísticas, agendamentos e demais recursos operacionais.
 
-O projeto segue o mesmo padrão usado no `n8n-nodes-clinicorp`: um node de ação, uma credencial, TypeScript, catálogo gerado a partir da documentação da API, build validado por CI, publicação no npm via GitHub Actions e suporte a uso como Tool de Agente de IA.
+O projeto segue o mesmo padrão usado no \`n8n-nodes-clinicorp\`: um node de ação, uma credencial, TypeScript, catálogo gerado a partir da documentação da API, build validado por CI, publicação no npm via GitHub Actions e suporte a uso como Tool de Agente de IA.
 
 ## Funcionalidades
 
-- **Cobertura completa da documentação**: 298 chamadas da coleção pública Postman da Digisac, organizadas em 51 recursos no n8n.
+- **Cobertura completa da documentação**: ${endpoints.length} chamadas da coleção pública Postman da Digisac, organizadas em ${groups.length} recursos no n8n.
 - **Node único e intuitivo**: selecione **Resource -> Operation**, preencha os parâmetros obrigatórios e execute.
-- **Credencial centralizada**: Base URL e Bearer Token ficam salvos uma única vez na credencial `Digisac API`.
-- **Pronto para AI Agent**: o node tem `usableAsTool: true` e descrições pensadas para LLMs entenderem método, caminho, parâmetros, IDs, filtros e body JSON.
-- **Sem dependências runtime**: usa `httpRequestWithAuthentication` do próprio n8n.
-- **Catálogo rastreável**: `nodes/Digisac/generated/endpoints.ts` é gerado da documentação Postman; `docs/api-calls.md` lista todas as chamadas em português.
+- **Credencial centralizada**: Base URL e Bearer Token ficam salvos uma única vez na credencial \`Digisac API\`.
+- **Pronto para AI Agent**: o node tem \`usableAsTool: true\` e descrições pensadas para LLMs entenderem método, caminho, parâmetros, IDs, filtros e body JSON.
+- **Sem dependências runtime**: usa \`httpRequestWithAuthentication\` do próprio n8n.
+- **Catálogo rastreável**: \`nodes/Digisac/generated/endpoints.ts\` é gerado da documentação Postman; \`docs/api-calls.md\` lista todas as chamadas em português.
 - **Publicação segura**: GitHub Actions publica no npm com provenance.
 
 ## Instalação
 
 No n8n, acesse **Settings -> Community Nodes -> Install** e instale:
 
-```text
+\`\`\`text
 n8n-nodes-digisac
-```
+\`\`\`
 
 Para usar community nodes como Tools de Agente de IA em n8n self-hosted, habilite:
 
-```bash
+\`\`\`bash
 N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
-```
+\`\`\`
 
 Sem essa variável, o node pode funcionar como node normal, mas não aparecer como tool no AI Agent em instalações self-hosted.
 
@@ -38,24 +146,24 @@ Crie uma credencial chamada **Digisac API**.
 
 | Campo | O que preencher | Onde encontrar |
 | --- | --- | --- |
-| **Base URL** | URL base da sua conta Digisac, sem barra final. Exemplo: `https://suaempresa.digisac.app`. | Digisac -> Conta -> Informações |
+| **Base URL** | URL base da sua conta Digisac, sem barra final. Exemplo: \`https://suaempresa.digisac.app\`. | Digisac -> Conta -> Informações |
 | **Access Token** | Token Bearer de acesso pessoal. | Digisac -> Conta -> API -> Tokens de acesso pessoal |
-| **PDF/Base URL** | Base opcional para endpoints documentados como `URLbase`, principalmente export de PDF. Se vazio, o node reutiliza a Base URL. | Use só se sua instância separar URL de API e URL de PDF |
+| **PDF/Base URL** | Base opcional para endpoints documentados como \`URLbase\`, principalmente export de PDF. Se vazio, o node reutiliza a Base URL. | Use só se sua instância separar URL de API e URL de PDF |
 
 A credencial testa o acesso com:
 
-```http
+\`\`\`http
 GET /api/v1/me
-```
+\`\`\`
 
 ## Como usar o node
 
 1. Adicione o node **Digisac** no workflow.
-2. Escolha o **Resource**. O resource corresponde a uma pasta da documentação, como `Contatos`, `Mensagens`, `Chamados`, `Campanhas`, `Tags`, `Usuários`, `Webhooks`.
+2. Escolha o **Resource**. O resource corresponde a uma pasta da documentação, como \`Contatos\`, \`Mensagens\`, \`Chamados\`, \`Campanhas\`, \`Tags\`, \`Usuários\`, \`Webhooks\`.
 3. Escolha a **Operation**. Cada operation corresponde a uma chamada real da API.
-4. Preencha os campos obrigatórios de path, como `contactId`, `ticketId`, `serviceId`, `messageId`, `userId`, `campaignId`.
+4. Preencha os campos obrigatórios de path, como \`contactId\`, \`ticketId\`, \`serviceId\`, \`messageId\`, \`userId\`, \`campaignId\`.
 5. Use **Additional Query Parameters JSON** para filtros, paginação e queries complexas.
-6. Use **Request Body JSON** para chamadas `POST`, `PUT` e `PATCH`.
+6. Use **Request Body JSON** para chamadas \`POST\`, \`PUT\` e \`PATCH\`.
 7. Em exports CSV/TXT/PDF, se a resposta não vier como JSON, use **Options -> Response Format -> Text**.
 
 ## Campos principais do node
@@ -64,9 +172,9 @@ GET /api/v1/me
 | --- | --- |
 | **Resource** | Área funcional da API Digisac, gerada a partir das pastas Postman. |
 | **Operation** | Chamada exata da API. A descrição mostra método, endpoint, origem na documentação e placeholders. |
-| **Path Parameters** | Campos obrigatórios extraídos de placeholders como `{{contactId}}`. |
-| **Query: ...** | Campos opcionais extraídos de placeholders de query, como `serviceId`, `departmentId`, `from`, `to`. |
-| **Additional Query Parameters JSON** | Objeto JSON livre mesclado na query string. Use para `perPage`, `query`, `where[...]`, filtros e includes. |
+| **Path Parameters** | Campos obrigatórios extraídos de placeholders como \`{{contactId}}\`. |
+| **Query: ...** | Campos opcionais extraídos de placeholders de query, como \`serviceId\`, \`departmentId\`, \`from\`, \`to\`. |
+| **Additional Query Parameters JSON** | Objeto JSON livre mesclado na query string. Use para \`perPage\`, \`query\`, \`where[...]\`, filtros e includes. |
 | **Request Body JSON** | Body enviado para operações de escrita. Aceita objeto ou array JSON. |
 | **Options** | Controla inclusão da query documentada, formato de resposta e comportamento de placeholders não preenchidos. |
 
@@ -77,11 +185,11 @@ GET /api/v1/me
 Resource: **Contatos (General)**  
 Operation: **Listar todos os contatos**
 
-```json
+\`\`\`json
 {
   "perPage": 40
 }
-```
+\`\`\`
 
 ### Buscar contato por número em uma conexão
 
@@ -90,24 +198,24 @@ Operation: **Buscar contato por numero de uma conexao especifica**
 
 Preencha:
 
-- `Query: Number`: número ou parte do número
-- `Query: Service Id`: ID da conexão
+- \`Query: Number\`: número ou parte do número
+- \`Query: Service Id\`: ID da conexão
 
 Também é possível passar manualmente:
 
-```json
+\`\`\`json
 {
   "where[data.number][$iLike]": "%5511999999999%",
   "where[serviceId]": "SERVICE_ID"
 }
-```
+\`\`\`
 
 ### Enviar mensagem
 
 Resource: **Mensagens (General)**  
 Operation: **Enviar mensagem**
 
-```json
+\`\`\`json
 {
   "text": "Olá, tudo bem?",
   "type": "chat",
@@ -115,7 +223,7 @@ Operation: **Enviar mensagem**
   "userId": "USER_ID",
   "origin": "bot"
 }
-```
+\`\`\`
 
 ### Enviar arquivo por mensagem
 
@@ -124,7 +232,7 @@ Operation: **Enviar imagem**, **Enviar PDF** ou **Enviar áudio**
 
 Exemplo de body:
 
-```json
+\`\`\`json
 {
   "type": "file",
   "contactId": "CONTACT_ID",
@@ -135,19 +243,19 @@ Exemplo de body:
     "name": "documento.pdf"
   }
 }
-```
+\`\`\`
 
 ### Buscar chamados de um contato
 
 Resource: **Chamados (General)**  
 Operation: **Buscar chamados do contato**
 
-```json
+\`\`\`json
 {
   "where[contactId]": "CONTACT_ID",
   "perPage": 40
 }
-```
+\`\`\`
 
 ### Transferir chamado
 
@@ -156,36 +264,36 @@ Operation: **Transferência de chamado**
 
 Path:
 
-- `Contact Id`: ID do contato
+- \`Contact Id\`: ID do contato
 
 Body:
 
-```json
+\`\`\`json
 {
   "departmentId": "DEPARTMENT_ID",
   "userId": "USER_ID",
   "comments": "Transferido pelo fluxo do n8n"
 }
-```
+\`\`\`
 
 ### Fechar chamado com assunto
 
 Resource: **Chamados (General)**  
 Operation: **Fechar um chamado com assunto**
 
-```json
+\`\`\`json
 {
   "ticketTopicIds": ["TICKET_TOPIC_ID"],
   "comments": "Atendimento finalizado pelo fluxo"
 }
-```
+\`\`\`
 
 ### Buscar estatísticas de atendimento
 
 Resource: **Estatísticas de atendimento (General)**  
 Operation: **Buscar estatísticas com todos os filtros ativos**
 
-```json
+\`\`\`json
 {
   "startPeriod": "2026-07-01T00:00:00.000Z",
   "endPeriod": "2026-07-31T23:59:59.999Z",
@@ -194,14 +302,14 @@ Operation: **Buscar estatísticas com todos os filtros ativos**
   "periodType": "openDate",
   "status": "all"
 }
-```
+\`\`\`
 
 ### Criar webhook
 
 Resource: **Webhooks (General)**  
 Operation: **Criar webhook**
 
-```json
+\`\`\`json
 {
   "active": true,
   "name": "Webhook n8n",
@@ -209,7 +317,7 @@ Operation: **Criar webhook**
   "events": ["message.created", "ticket.closed"],
   "type": "http"
 }
-```
+\`\`\`
 
 ## Todas as chamadas da API
 
@@ -217,65 +325,15 @@ O catálogo completo fica em [docs/api-calls.md](docs/api-calls.md).
 
 Resumo por método:
 
-```text
-GET: 144 | POST: 93 | PUT: 34 | PATCH: 1 | DELETE: 26
-```
+\`\`\`text
+${methodSummary(endpoints)}
+\`\`\`
 
 Resumo por recurso:
 
 | Recurso | Chamadas |
 | --- | ---: |
-| Acionamento flag no robo (General) | 1 |
-| Agendamentos (General) | 5 |
-| Agora (General) | 3 |
-| Agora (Popular) | 3 |
-| Assuntos de chamado (General) | 5 |
-| Auditoria de autenticacao (General) | 2 |
-| Autorizacao (General) | 1 |
-| Autorizacao (Popular) | 1 |
-| Avaliacoes (General) | 5 |
-| Campanhas (General) | 7 |
-| Campos personalizados (General) | 5 |
-| Cargos (General) | 7 |
-| Central de notificacoes (General) | 2 |
-| Chamados (General) | 7 |
-| Chamados (Popular) | 6 |
-| Conexoes (General) | 11 |
-| Contatos (General) | 22 |
-| Contatos (Popular) | 22 |
-| Controle de ausencia (General) | 1 |
-| Creditos SMS (General) | 3 |
-| Departamentos (General) | 6 |
-| Distribuicao de chamados (General) | 6 |
-| Estatisticas de atendimento (General) | 10 |
-| Estatisticas de atendimento (Popular) | 7 |
-| Estatisticas de avaliacoes (General) | 7 |
-| Feriados (General) | 5 |
-| Funil de vendas (General) | 10 |
-| Grupos WhatsApp (General) | 4 |
-| Historico de chamados (General) | 12 |
-| Historico de chamados (Popular) | 9 |
-| Idioma da plataforma (General) | 1 |
-| Integracoes (General) | 2 |
-| Mensagens (General) | 13 |
-| Mensagens (Popular) | 8 |
-| Mensagens interativas (General) | 7 |
-| Meus dados (General) | 1 |
-| Notificacao (General) | 3 |
-| Organizacoes (General) | 5 |
-| Pessoas (General) | 5 |
-| Planos (General) | 2 |
-| Redefinir senha (General) | 1 |
-| Respostas rapidas (General) | 7 |
-| Robos (General) | 6 |
-| Tags (General) | 8 |
-| Templates (General) | 11 |
-| Termos de aceite (General) | 5 |
-| Tokens (General) | 5 |
-| Usuarios (General) | 6 |
-| Versoes (General) | 1 |
-| Webhooks (General) | 5 |
-| WhatsApp (General) | 1 |
+${groupSummaryRows(groups)}
 
 ## Uso como Tool de Agente de IA
 
@@ -283,40 +341,40 @@ O node pode ser conectado ao **AI Agent** do n8n como uma tool. A prática recom
 
 ### Prompt recomendado para o System Message
 
-```text
+\`\`\`text
 Você pode usar as tools Digisac somente quando o usuário pedir para consultar, criar ou alterar dados na Digisac.
 Nunca invente IDs. Se faltar contactId, ticketId, departmentId, serviceId, userId, messageId, tagId, campaignId ou templateId, primeiro use uma operação de listagem ou busca.
 Para operações POST, PUT e PATCH, envie um body JSON mínimo, somente com os campos necessários.
 Para filtros de data/hora, use ISO-8601 quando o endpoint esperar timestamp.
 Para exportações CSV, TXT ou PDF, use Response Format = Text se a resposta não for JSON.
 Antes de criar, editar, excluir, arquivar, bloquear, fechar chamado ou enviar mensagem, confirme que a intenção do usuário está clara.
-```
+\`\`\`
 
-### Exemplos de `$fromAI()`
+### Exemplos de \`$fromAI()\`
 
 Contato existente:
 
-```javascript
+\`\`\`javascript
 {{ $fromAI('contactId', 'ID existente de contato Digisac. Deve vir de uma busca/listagem anterior, nunca inventado.', 'string') }}
-```
+\`\`\`
 
 Texto de mensagem:
 
-```javascript
+\`\`\`javascript
 {{ $fromAI('messageText', 'Texto exato que será enviado ao contato no WhatsApp/Digisac.', 'string') }}
-```
+\`\`\`
 
 Filtro de período:
 
-```javascript
+\`\`\`javascript
 {{ $fromAI('startPeriod', 'Início do período em ISO-8601, por exemplo 2026-07-01T00:00:00.000Z.', 'string') }}
-```
+\`\`\`
 
 Body JSON:
 
-```javascript
+\`\`\`javascript
 {{ $fromAI('body', 'Objeto JSON válido com os campos exigidos pela operação Digisac selecionada.', 'json') }}
-```
+\`\`\`
 
 ### Boas práticas para LLMs
 
@@ -324,24 +382,24 @@ Body JSON:
 - Prefira operações de leitura antes de escrita.
 - Nunca deixe o modelo inventar IDs.
 - Use credenciais dedicadas por ambiente/cliente.
-- Para operações destrutivas (`DELETE`, arquivar, bloquear, fechar chamado), coloque etapa humana de confirmação quando o fluxo for sensível.
+- Para operações destrutivas (\`DELETE\`, arquivar, bloquear, fechar chamado), coloque etapa humana de confirmação quando o fluxo for sensível.
 - Em mensagens enviadas ao cliente, gere o texto em etapa anterior e passe o texto final para a tool.
 - Para bodies grandes, use JSON explícito e valide campos obrigatórios no workflow antes da chamada.
 
 ## Desenvolvimento
 
-```bash
+\`\`\`bash
 npm install
 npm run generate:endpoints
 npm run generate:docs
 npm run lint
 npm run build
 npm run dev
-```
+\`\`\`
 
 Estrutura:
 
-```text
+\`\`\`text
 n8n-nodes-digisac/
 ├── credentials/
 │   └── DigisacApi.credentials.ts
@@ -357,28 +415,28 @@ n8n-nodes-digisac/
 │   └── generate-endpoints.mjs
 └── docs/
     └── api-calls.md
-```
+\`\`\`
 
 ## Como o catálogo é gerado
 
-O script `scripts/generate-endpoints.mjs` baixa a coleção pública:
+O script \`scripts/generate-endpoints.mjs\` baixa a coleção pública:
 
-```text
+\`\`\`text
 https://documenter.getpostman.com/view/53282970/2sBXihpXmF
-```
+\`\`\`
 
 E gera:
 
-```text
+\`\`\`text
 nodes/Digisac/generated/endpoints.ts
-```
+\`\`\`
 
-O script `scripts/generate-docs.mjs` lê esse catálogo e gera:
+O script \`scripts/generate-docs.mjs\` lê esse catálogo e gera:
 
-```text
+\`\`\`text
 README.md
 docs/api-calls.md
-```
+\`\`\`
 
 ## Publicação no npm
 
@@ -386,31 +444,49 @@ O projeto publica pelo mesmo padrão do node Clinicorp: GitHub Actions + npm pro
 
 Para publicar nova versão:
 
-```bash
+\`\`\`bash
 npm version patch
 git push origin main --tags
-```
+\`\`\`
 
 O workflow executa:
 
-```bash
+\`\`\`bash
 npm ci --ignore-scripts
 npm run build
 npm publish --provenance --access public
-```
+\`\`\`
 
 ## Versões
 
-- **1.0.1** — Documentação reescrita em PT-BR, com exemplos práticos, instruções de AI Tool e catálogo completo de chamadas em `docs/api-calls.md`.
-- **1.0.0** — Primeira versão publicada. Node único `Digisac`, credencial Bearer, catálogo com 298 chamadas da documentação Postman, suporte a AI Agent e publicação npm via GitHub Actions.
+- **1.0.1** — Documentação reescrita em PT-BR, com exemplos práticos, instruções de AI Tool e catálogo completo de chamadas em \`docs/api-calls.md\`.
+- **1.0.0** — Primeira versão publicada. Node único \`Digisac\`, credencial Bearer, catálogo com ${endpoints.length} chamadas da documentação Postman, suporte a AI Agent e publicação npm via GitHub Actions.
 
 ## Referências
 
 - [Documentação Postman da Digisac](https://documenter.getpostman.com/view/53282970/2sBXihpXmF)
 - [n8n: building community nodes](https://docs.n8n.io/integrations/community-nodes/building-community-nodes/)
 - [n8n: programmatic node tutorial](https://docs.n8n.io/connect/create-nodes/build-your-node/tutorial-build-a-programmatic-style-node/)
-- [n8n: `$fromAI()`](https://docs.n8n.io/build/integrate-ai/ai-examples/use-ai-for-parameters/)
+- [n8n: \`$fromAI()\`](https://docs.n8n.io/build/integrate-ai/ai-examples/use-ai-for-parameters/)
 
 ## Licença
 
 [MIT](LICENSE.md)
+`;
+}
+
+async function main() {
+	const endpoints = await loadEndpoints();
+	const groups = groupEndpoints(endpoints);
+
+	await mkdir(path.dirname(API_DOC_FILE), { recursive: true });
+	await writeFile(README_FILE, readme(endpoints, groups));
+	await writeFile(API_DOC_FILE, apiDoc(endpoints, groups));
+
+	console.log(`Generated README.md and docs/api-calls.md for ${endpoints.length} endpoints.`);
+}
+
+main().catch((error) => {
+	console.error(error);
+	process.exit(1);
+});
