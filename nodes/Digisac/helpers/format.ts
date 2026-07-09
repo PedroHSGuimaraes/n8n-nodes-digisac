@@ -69,8 +69,33 @@ export function replaceTemplateVariables(
 	});
 }
 
+export function replaceTemplateValues(
+	template: string,
+	values: Record<string, string | number | boolean>,
+): string {
+	return String(template ?? '').replace(PLACEHOLDER_RE, (match, key: string) => {
+		const value = values[key];
+		if (value === undefined || value === null || value === '') {
+			return match;
+		}
+		return String(value);
+	});
+}
+
 export function hasUnresolvedPlaceholders(value: string): boolean {
-	return PLACEHOLDER_RE.test(String(value ?? ''));
+	return /\{\{([^}]+)\}\}/.test(String(value ?? ''));
+}
+
+export function templateVariables(value: string): string[] {
+	return [...String(value ?? '').matchAll(/\{\{([^}]+)\}\}/g)].map((match) => match[1]);
+}
+
+export function safeDecodeURIComponent(value: string): string {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return value;
+	}
 }
 
 export function queryStringToObject(query: string, skipUnresolved: boolean): IDataObject {
@@ -81,8 +106,8 @@ export function queryStringToObject(query: string, skipUnresolved: boolean): IDa
 	for (const part of trimmed.split('&')) {
 		if (!part) continue;
 		const [rawKey, ...rawValueParts] = part.split('=');
-		const key = decodeURIComponent(rawKey ?? '');
-		const value = decodeURIComponent(rawValueParts.join('=') ?? '');
+		const key = safeDecodeURIComponent(rawKey ?? '');
+		const value = safeDecodeURIComponent(rawValueParts.join('=') ?? '');
 		if (!key) continue;
 		if (skipUnresolved && (hasUnresolvedPlaceholders(key) || hasUnresolvedPlaceholders(value))) {
 			continue;

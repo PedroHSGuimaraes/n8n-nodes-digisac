@@ -13,12 +13,12 @@ export class Digisac implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Digisac',
 		name: 'digisac',
-		icon: { light: 'file:digisac.svg', dark: 'file:digisac.dark.svg' },
+		icon: { light: 'file:digisac.png', dark: 'file:digisac.dark.png' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
-			'Use every documented Digisac API request from the public Postman documentation. Choose a resource folder and operation, fill required path parameters, add query JSON/body JSON when needed, and the node sends the authenticated Bearer request to the Base URL stored in the credential. Built for AI Agents: operation descriptions include method, path, source folder, required path variables, query placeholders and body guidance so the LLM can choose the correct endpoint and avoid inventing IDs.',
+			'Use every documented Digisac API request from the public Postman documentation. Choose a resource folder and operation, fill required path parameters and use the generated query/body fields first. Advanced JSON fields are available only when an operation needs a custom payload or unsupported filter. Built for AI Agents: operation descriptions include method, path, source folder, required path variables, query guidance, body fields and explicit reminders to use IDs returned by Digisac instead of inventing values.',
 		defaults: {
 			name: 'Digisac',
 		},

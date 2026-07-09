@@ -10,7 +10,7 @@ export class DigisacApi implements ICredentialType {
 
 	displayName = 'Digisac API';
 
-	icon = { light: 'file:digisac.svg', dark: 'file:digisac.dark.svg' } as const;
+	icon = { light: 'file:digisac.png', dark: 'file:digisac.dark.png' } as const;
 
 	documentationUrl = 'https://documenter.getpostman.com/view/53282970/2sBXihpXmF';
 
