@@ -169,7 +169,7 @@ describe('apagar com confirmação', () => {
 	});
 });
 
-describe('ID que escapa da rota (achado F2 da the-judge)', () => {
+describe('ID que escapa da rota (achado F2 da the-judge; desde a 1.2.1 vale para o catálogo inteiro, ver path-ponto.test.cjs)', () => {
 	it('K6.01 o Kanban recusa . e .. como ID', async () => {
 		// "." e ".." passam pelo encodeURIComponent e o URL os resolve para fora do recurso
 		// (DELETE /kanban-boards/.. viraria uma chamada à raiz da API). Vale para as 17 operações.
@@ -194,18 +194,5 @@ describe('ID que escapa da rota (achado F2 da the-judge)', () => {
 				}
 			}
 		}
-	});
-
-	it('K6.01 as operações antigas não mudam com ponto no ID', async () => {
-		// Decisão do Jev (0,87): a recusa vale só para o Kanban; workflow salvo das 298 antigas fica igual.
-		const antiga = DIGISAC_ENDPOINTS.find(
-			(e) => !KANBAN.some(([id]) => id === e.id) && e.method === 'GET' && e.pathParams.length === 1,
-		);
-		const contexto = criarContexto(1, {
-			operation: antiga.id,
-			[`path_${antiga.id}_${antiga.pathParams[0]}`]: '..',
-		});
-		await new Digisac().execute.call(contexto);
-		assert.equal(contexto.requisicoes.length, 1);
 	});
 });

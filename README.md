@@ -454,6 +454,7 @@ A tag `vX.Y.Z` dispara o workflow `publish.yml`, que envia a versão com `npm st
 
 ## 📈 Versões
 
+- **1.2.1** — **Recusa nova de valor inválido.** Todo parâmetro de caminho recusa `.` e `..`, nas versões 1 e 2 do node, porque o URL os resolve para fora do recurso. Veja o `CHANGELOG.md`.
 - **1.2.0** — **Kanban.** 17 operações novas de quadros, colunas e cards, com lista pesquisável na versão 2 e **Confirm Delete** nas três de excluir. O catálogo passa a guardar o ID de cada operação: nenhum workflow salvo muda de operação. Veja o `CHANGELOG.md`.
 - **1.1.0** — **IDs, datas e valores guiados.** Em node novo (versão 2 do node), contato, conexão, departamento, usuário, tag, cargo, robô e assunto aparecem em lista pesquisável; datas têm seletor; valores fixos viram opções. Workflows salvos continuam na versão 1. Migração para o `@n8n/node-cli` 0.55.5, lint oficial sem erros, testes, CI e timeout de 30 s. Veja o `CHANGELOG.md`.
 - **1.0.3** — Descrições de AI Tool reforçadas: regra para campos `Id/Ids`, alertas para placeholders, orientação Popular vs General e avisos por tipo de campo.

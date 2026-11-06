@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1
+
+- **Recusa nova de valor inválido.** Todo parâmetro de caminho recusa os valores `.` e `..`. A recusa vale para as 137 operações que têm parâmetro de caminho, nas versões 1 e 2 do node. O node lança `<Parâmetro> is not valid` antes de qualquer requisição.
+- **Por que a recusa existe.** O URL resolve `..` para fora do recurso. Com o ID `..`, a rota `/api/v1/<recurso>/..` vira `/api/v1/`, que é outra rota do Digisac. Um `DELETE` com esse valor chamava a rota errada.
+- **Quem já usava o Kanban não muda.** As 17 operações do Kanban já recusavam esses valores desde a 1.2.0.
+- **O que não muda.** Um ID normal, um ID com ponto no meio (`a.b`) e um ID numérico enviam a mesma requisição de antes. Nenhum parâmetro, nome ou ID de operação muda.
+
 ## 1.2.0
 
 - **Kanban: 17 operações novas.** O resource **Kanban (General)** traz quadros (listar, buscar, criar, editar, excluir), colunas (as mesmas cinco e reordenar) e cards (as mesmas cinco e reordenar), todas da coleção Postman oficial. A pasta é a última da coleção que o node ainda não cobria.
