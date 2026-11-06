@@ -168,6 +168,6 @@ Proof: run unit | ℹ fail 0
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** none
-- **Boundary:** nothing closed yet
+- **Dispatched:** Verifier (sonnet), HEAD a ser registrado no commit de proofs, intervalo origin/main..HEAD - sent
+- **Boundary:** C1-C40 verdes em check_proofs (43 pass, 0 fail) em 49a4e17
 - **Abandoned:** none
