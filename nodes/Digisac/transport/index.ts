@@ -3,11 +3,16 @@ import type {
 	IExecuteFunctions,
 	IHttpRequestMethods,
 	IHttpRequestOptions,
+	ILoadOptionsFunctions,
 	JsonObject,
 } from 'n8n-workflow';
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 import { trimTrailingSlash } from '../helpers/format';
+
+// Tempo máximo de espera por resposta do Digisac, em milissegundos. 30 s cobre exportações
+// (CSV/PDF) sem prender o workflow para sempre se o serviço travar.
+export const DIGISAC_REQUEST_TIMEOUT_MS = 30000;
 
 export type DigisacResponseFormat = 'json' | 'text';
 
@@ -17,8 +22,11 @@ export interface DigisacRequestConfig {
 	responseFormat?: DigisacResponseFormat;
 }
 
+// O `execute` e o `listSearch` chamam o mesmo transporte; os dois contextos têm credencial e helpers.
+type DigisacContext = IExecuteFunctions | ILoadOptionsFunctions;
+
 async function getBaseUrl(
-	this: IExecuteFunctions,
+	this: DigisacContext,
 	baseVariable: 'URL' | 'URLbase' | '' = 'URL',
 ): Promise<string> {
 	const credentials = await this.getCredentials('digisacApi');
@@ -39,13 +47,13 @@ async function getBaseUrl(
 }
 
 export async function digisacApiRequest(
-	this: IExecuteFunctions,
+	this: DigisacContext,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject | IDataObject[] = {},
 	qs: IDataObject = {},
 	config: DigisacRequestConfig = {},
-): Promise<any> {
+): Promise<unknown> {
 	const responseFormat = config.responseFormat ?? 'json';
 	const options: IHttpRequestOptions = {
 		method,
@@ -53,6 +61,8 @@ export async function digisacApiRequest(
 		qs,
 		body,
 		json: responseFormat === 'json',
+		// Sem timeout, uma chamada pendurada travaria o item do workflow indefinidamente.
+		timeout: DIGISAC_REQUEST_TIMEOUT_MS,
 	};
 
 	if (!config.absoluteUrl) {

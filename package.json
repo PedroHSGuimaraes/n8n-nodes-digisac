@@ -1,68 +1,78 @@
 {
-  "name": "n8n-nodes-digisac",
-  "version": "1.0.3",
-  "description": "n8n community node for the Digisac API: contacts, tickets, messages, campaigns, services, departments, users, tags, schedules, webhooks, reports and every documented Postman endpoint. Usable as an AI Agent tool.",
-  "keywords": [
-    "n8n-community-node-package",
-    "n8n",
-    "digisac",
-    "diasac",
-    "whatsapp",
-    "crm",
-    "tickets",
-    "contacts",
-    "messages",
-    "automation"
-  ],
-  "license": "MIT",
-  "homepage": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac#readme",
-  "author": {
-    "name": "Pedro Henrique Santos Guimaraes",
-    "email": "pedro.guimaraes02@hotmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PedroHSGuimaraes/n8n-nodes-digisac.git"
-  },
-  "bugs": {
-    "url": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/issues"
-  },
-  "main": "dist/nodes/Digisac/Digisac.node.js",
-  "scripts": {
-    "build": "npm run generate:endpoints && tsc && gulp build:icons",
-    "dev": "tsc --watch",
-    "format": "prettier nodes credentials scripts package.json README.md --write",
-    "generate:endpoints": "node scripts/generate-endpoints.mjs",
-    "generate:docs": "node scripts/generate-docs.mjs",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build"
-  },
-  "files": [
-    "dist",
-    "docs"
-  ],
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "credentials": [
-      "dist/credentials/DigisacApi.credentials.js"
-    ],
-    "nodes": [
-      "dist/nodes/Digisac/Digisac.node.js"
-    ]
-  },
-  "peerDependencies": {
-    "n8n-workflow": "*"
-  },
-  "devDependencies": {
-    "@n8n/eslint-plugin-community-nodes": "^0.23.0",
-    "@n8n/node-cli": "^0.38.8",
-    "@types/node": "^18.19.0",
-    "eslint": "^9.29.0",
-    "gulp": "^4.0.2",
-    "n8n-workflow": "^2.16.0",
-    "prettier": "^3.3.0",
-    "typescript": "^5.5.0",
-    "typescript-eslint": "^8.63.0"
-  }
+	"name": "n8n-nodes-digisac",
+	"version": "1.1.0",
+	"description": "n8n community node for the Digisac API: contacts, tickets, messages, campaigns, services, departments, users, tags, schedules, webhooks, reports and every documented Postman endpoint. Usable as an AI Agent tool.",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n",
+		"digisac",
+		"diasac",
+		"whatsapp",
+		"crm",
+		"tickets",
+		"contacts",
+		"messages",
+		"automation"
+	],
+	"license": "MIT",
+	"homepage": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac#readme",
+	"author": {
+		"name": "Pedro Henrique Santos Guimaraes",
+		"email": "pedro.guimaraes02@hotmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/PedroHSGuimaraes/n8n-nodes-digisac.git"
+	},
+	"bugs": {
+		"url": "https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/issues"
+	},
+	"main": "dist/nodes/Digisac/Digisac.node.js",
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"generate:endpoints": "node scripts/generate-endpoints.mjs",
+		"generate:docs": "node scripts/generate-docs.mjs",
+		"format": "prettier nodes credentials scripts test package.json README.md CHANGELOG.md --write",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"test": "npm run build --silent && node --test --test-reporter=spec test/*.test.cjs",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist",
+		"docs"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/DigisacApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Digisac/Digisac.node.js"
+		]
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "0.55.5",
+		"@types/node": "^24.0.0",
+		"eslint": "9.32.0",
+		"n8n-workflow": "^2.46.5",
+		"prettier": "3.6.2",
+		"release-it": "^21.1.0",
+		"typescript": "5.9.2"
+	},
+	"funding": {
+		"type": "individual",
+		"url": "https://buymeacoffee.com/qTny0AzFXS"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	}
 }

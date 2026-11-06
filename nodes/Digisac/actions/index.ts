@@ -2,6 +2,7 @@ import type {
 	IDataObject,
 	IExecuteFunctions,
 	IHttpRequestMethods,
+	INodeParameters,
 	INodeProperties,
 	INodePropertyOptions,
 } from 'n8n-workflow';
@@ -10,7 +11,6 @@ import { NodeOperationError } from 'n8n-workflow';
 import {
 	DIGISAC_ENDPOINTS,
 	type DigisacEndpointDefinition,
-	type DigisacHttpMethod,
 } from '../generated/endpoints';
 import {
 	compactDescription,
@@ -23,6 +23,8 @@ import {
 	templateVariables,
 	toTitle,
 } from '../helpers/format';
+import { getIdParameter, plainValue } from '../helpers/resourceLocator';
+import { guideQueryField, isDateQueryKey, toIsoDate } from '../helpers/valoresGuiados';
 import { digisacApiRequest, type DigisacResponseFormat } from '../transport';
 
 type QueryEntry = {
@@ -344,7 +346,7 @@ function operationDescription(endpoint: DigisacEndpointDefinition): string {
 	}
 	if (endpoint.hasBody && bodyFields.length) {
 		parts.push(
-			`Campos do Body gerados: ${bodyFieldsSummary(bodyFields)}. Preencha somente os campos necessarios; campos vazios nao sao enviados. Use Body JSON Avancado somente se essa lista nao cobrir a estrutura necessaria.`,
+			`Body Fields gerados: ${bodyFieldsSummary(bodyFields)}. Preencha somente os campos necessarios; campos vazios nao sao enviados. Use Body JSON Avancado somente se essa lista nao cobrir a estrutura necessaria.`,
 		);
 	}
 	if (endpoint.hasBody && !bodyFields.length && endpoint.bodyExample.trim()) {
@@ -364,6 +366,8 @@ function operationDescription(endpoint: DigisacEndpointDefinition): string {
 function operationProperties(): INodeProperties[] {
 	return resourceIds.map((resource) => {
 		const endpoints = endpointsForResource(resource);
+		// Primeira chamada da pasta como padrão; fica em constante para o lint ver um `default` simples.
+		const firstOperation: string = endpoints[0]?.id ?? '';
 		return {
 			displayName: 'Operation',
 			name: 'operation',
@@ -376,7 +380,7 @@ function operationProperties(): INodeProperties[] {
 				action: `${endpoint.method} ${endpoint.operationName}`.slice(0, 128),
 				description: operationDescription(endpoint),
 			})),
-			default: endpoints[0]?.id ?? '',
+			default: firstOperation,
 			description:
 				'Chamada exata da API Digisac. Leia a descricao de cada option antes de escolher: ela informa quando usar, metodo HTTP, endpoint, parametros obrigatorios, query, body e cuidados para nao inventar IDs.',
 		};
@@ -401,15 +405,19 @@ function queryFieldProperties(): INodeProperties[] {
 	const simpleFields: INodeProperties[] = DIGISAC_ENDPOINTS.flatMap((endpoint) =>
 		(queryEntriesByOperation.get(endpoint.id) ?? [])
 			.filter((entry) => entry.showField)
-			.map((entry): INodeProperties => ({
-				displayName: entry.displayName,
-				name: entry.field,
-				type: 'string',
-				default: queryDefault(entry),
-				placeholder: queryPlaceholder(entry),
-				displayOptions: { show: { operation: [endpoint.id] } },
-				description: `Parametro de query opcional "${entry.key}" para ${endpoint.method} ${endpoint.pathTemplate}. Template documentado: "${compactDescription(entry.value || '(valor livre)', 120)}". Deixe vazio para omitir. ${querySpecificGuidance(entry)} Nao copie placeholders da documentacao; substitua por valor real.`,
-			})),
+			.flatMap((entry): INodeProperties[] => {
+				const field: INodeProperties = {
+					displayName: entry.displayName,
+					name: entry.field,
+					type: 'string',
+					default: queryDefault(entry),
+					placeholder: queryPlaceholder(entry),
+					displayOptions: { show: { operation: [endpoint.id] } },
+					description: `Parametro de query opcional "${entry.key}" para ${endpoint.method} ${endpoint.pathTemplate}. Template documentado: "${compactDescription(entry.value || '(valor livre)', 120)}". Deixe vazio para omitir. ${querySpecificGuidance(entry)} Nao copie placeholders da documentacao; substitua por valor real.`,
+				};
+				// Datas e valores fixos ganham a cópia guiada da versão 2; os demais campos passam iguais.
+				return guideQueryField(field, entry.key, enumChoicesFromValue(entry.value));
+			}),
 	);
 
 	const complexPlaceholderFields: INodeProperties[] = DIGISAC_ENDPOINTS.flatMap((endpoint) => {
@@ -636,8 +644,8 @@ function bodyFieldsParameter(endpoint: DigisacEndpointDefinition): string {
 	return fieldName('bodyFields', endpoint.id, 'fields');
 }
 
-function bodyFieldsDefault(fields: BodyFieldDefinition[]): IDataObject {
-	return fields.reduce<IDataObject>((defaults, field) => {
+function bodyFieldsDefault(fields: BodyFieldDefinition[]): INodeParameters {
+	return fields.reduce<INodeParameters>((defaults, field) => {
 		defaults[field.key] = field.defaultValue;
 		return defaults;
 	}, {});
@@ -647,12 +655,15 @@ function bodyFieldProperties(): INodeProperties[] {
 	return DIGISAC_ENDPOINTS.filter((endpoint) => bodyFieldOperationIds.includes(endpoint.id)).map(
 		(endpoint): INodeProperties => {
 			const fields = bodyFieldsByOperation.get(endpoint.id) ?? [];
+			// Valores de exemplo da documentação como padrão da coleção; constante pelo mesmo motivo do lint.
+			const fieldDefaults = bodyFieldsDefault(fields);
 			return {
-				displayName: 'Campos do Body',
+				displayName: 'Body Fields',
 				name: bodyFieldsParameter(endpoint),
 				type: 'collection',
 				placeholder: 'Add Field',
-				default: bodyFieldsDefault(fields) as INodeProperties['default'],
+				// Espalha o objeto num literal: a regra de lint exige objeto como padrão de coleção e o valor continua o mesmo da 1.0.3.
+				default: { ...fieldDefaults },
 				displayOptions: { show: { operation: [endpoint.id], useRawBodyJson: [false] } },
 				description:
 					'Campos gerados a partir do body documentado pela Digisac. Para AI Agents: use estes campos antes de JSON manual; preencha somente dados que o usuario informou ou que vieram de uma busca anterior; valores vazios nao sao enviados.',
@@ -679,7 +690,7 @@ function useRawBodyProperties(): INodeProperties[] {
 			default: false,
 			displayOptions: { show: { operation: bodyFieldOperationIds } },
 			description:
-				'Ative somente quando os Campos do Body nao cobrirem a estrutura exigida pela Digisac. Para AI Agents, prefira campos dedicados; JSON avancado substitui todos os Campos do Body.',
+				'Whether to send the raw JSON below instead of the generated fields. Ative somente quando os Body Fields nao cobrirem a estrutura exigida pela Digisac. Para AI Agents, prefira campos dedicados; JSON avancado substitui todos os Body Fields.',
 		},
 	];
 }
@@ -708,7 +719,7 @@ function rawBodyProperties(): INodeProperties[] {
 			default: rawBodyDefault(endpoint),
 			displayOptions: { show: { operation: [endpoint.id], useRawBodyJson: [true] } },
 			description:
-				'JSON completo que substitui os Campos do Body desta operacao. Use somente quando precisar enviar uma estrutura customizada que os campos dedicados nao suportam. O JSON deve ser valido e conter apenas dados confirmados.',
+				'JSON completo que substitui os Body Fields desta operacao. Use somente quando precisar enviar uma estrutura customizada que os campos dedicados nao suportam. O JSON deve ser valido e conter apenas dados confirmados.',
 		}),
 	);
 
@@ -778,7 +789,8 @@ function collectPathValues(
 	const values: Record<string, string> = {};
 	for (const parameter of endpoint.pathParams) {
 		const name = fieldName('path', endpoint.id, parameter);
-		const value = node.getNodeParameter(name, i, '') as string;
+		// Leitura única: texto na versão 1, Resource Locator na versão 2 (vazio lança erro claro).
+		const value = getIdParameter(node, name, parameter, i);
 		if (value !== '') {
 			values[parameter] = value;
 		}
@@ -810,14 +822,21 @@ function buildSimpleQueryValue(
 	i: number,
 	entry: QueryEntry,
 ): string | undefined {
-	const configuredValue = node.getNodeParameter(entry.field, i, queryDefault(entry)) as string;
-	if (configuredValue === '') return undefined;
+	// O campo pode ser texto (versão 1), Resource Locator ou data (versão 2).
+	const rawValue = node.getNodeParameter(entry.field, i, queryDefault(entry));
+	// Na versão 2 o seletor de data entrega texto, Date ou DateTime; a API recebe ISO em UTC.
+	// Na versão 1 o texto segue como a pessoa digitou (igual à 1.0.3).
+	const isGuidedDate = node.getNode().typeVersion >= 2 && isDateQueryKey(entry.key);
+	const value = isGuidedDate
+		? toIsoDate(node, rawValue, entry.displayName, i)
+		: plainValue(rawValue);
+	if (value === '') return undefined;
 
 	if (entry.variables.length === 1) {
-		return replaceTemplateValues(entry.value, { [entry.variables[0]]: configuredValue });
+		return replaceTemplateValues(entry.value, { [entry.variables[0]]: value });
 	}
 
-	return configuredValue;
+	return value;
 }
 
 function buildComplexQueryValue(
@@ -908,7 +927,12 @@ function buildBodyFromFields(
 	const body: Record<string, unknown> = {};
 
 	for (const field of fields) {
-		const value = values[field.key];
+		// ID de body pode vir como Resource Locator na versão 2; os demais valores passam como estão.
+		const raw = values[field.key];
+		// Só desembrulha texto no formato {mode, value}; campos JSON com objeto de verdade passam intactos.
+		const isLocator =
+			field.type === 'string' && typeof raw === 'object' && raw !== null && 'mode' in raw && 'value' in raw;
+		const value = isLocator ? plainValue(raw) : raw;
 		if (!shouldUseBodyValue(value, field.type)) continue;
 
 		const normalized = normalizeBodyFieldValue(node, value, field);
@@ -971,18 +995,18 @@ function getAbsoluteUrl(
 	) as string;
 }
 
-function normalizeResponse(response: any, responseFormat: DigisacResponseFormat): IDataObject | IDataObject[] {
+function normalizeResponse(response: unknown, responseFormat: DigisacResponseFormat): IDataObject | IDataObject[] {
 	if (responseFormat === 'text') {
 		return { data: typeof response === 'string' ? response : JSON.stringify(response) };
 	}
-	return response;
+	return response as IDataObject | IDataObject[];
 }
 
 export async function executeEndpoint(
 	this: IExecuteFunctions,
 	operation: string,
 	i: number,
-): Promise<any> {
+): Promise<IDataObject | IDataObject[]> {
 	const endpoint = endpointOrThrow(this, operation);
 	const options = this.getNodeParameter('options', i, {}) as IDataObject;
 	const responseFormat = (options.responseFormat as DigisacResponseFormat) ?? 'json';
