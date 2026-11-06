@@ -183,6 +183,9 @@ describe('IDs guiados na versão 2', () => {
 		let pares = 0;
 		for (const [chave, lista] of grupos) {
 			if (!lista.some((p) => p.displayOptions?.show?.['@version'])) continue;
+			// Campo auxiliar do Kanban (filterBoard_/filterColumn_) existe só na versão 2, sem par na 1;
+			// o teste K4.05 prova que ele fica oculto na v1.
+			if (lista.length === 1 && !visivelNaV1(lista[0])) continue;
 			pares += 1;
 			assert.equal(lista.filter(visivelNaV1).length, 1, `${chave}: deve ter 1 cópia na v1`);
 			assert.equal(lista.filter(visivelNaV2).length, 1, `${chave}: deve ter 1 cópia na v2`);

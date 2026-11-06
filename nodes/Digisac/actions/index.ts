@@ -23,8 +23,23 @@ import {
 	templateVariables,
 	toTitle,
 } from '../helpers/format';
+import {
+	confirmDeleteName,
+	isKanbanEndpoint,
+	kanbanBodyOverride,
+	kanbanConfirmProperties,
+	kanbanDeleteNoun,
+	kanbanDeleteWarning,
+	kanbanHelperProperties,
+	kanbanQueryFromTemplate,
+} from '../helpers/kanban';
 import { getIdParameter, plainValue } from '../helpers/resourceLocator';
-import { guideQueryField, isDateQueryKey, toIsoDate } from '../helpers/valoresGuiados';
+import {
+	choiceOptions,
+	guideQueryField,
+	isDateQueryKey,
+	toIsoDate,
+} from '../helpers/valoresGuiados';
 import { digisacApiRequest, type DigisacResponseFormat } from '../transport';
 
 type QueryEntry = {
@@ -44,6 +59,8 @@ type BodyFieldDefinition = {
 	sample: string;
 	type: BodyFieldType;
 	defaultValue: string | number | boolean;
+	// Alternativas documentadas (só no Kanban); o campo vira lista de opções em vez de texto livre.
+	choices?: string[];
 };
 
 const endpointsById = new Map(DIGISAC_ENDPOINTS.map((endpoint) => [endpoint.id, endpoint]));
@@ -328,7 +345,8 @@ function operationDescription(endpoint: DigisacEndpointDefinition): string {
 	const entries = queryEntriesByOperation.get(endpoint.id) ?? [];
 	const bodyFields = bodyFieldsByOperation.get(endpoint.id) ?? [];
 	const parts = [
-		`Chamada Digisac documentada: ${endpoint.method} ${endpoint.pathTemplate || endpoint.rawUrl}.`,
+		// Operação de apagar do Kanban abre com o aviso e o campo de confirmação (vazio nas demais).
+		`${kanbanDeleteWarning(endpoint)}Chamada Digisac documentada: ${endpoint.method} ${endpoint.pathTemplate || endpoint.rawUrl}.`,
 		`Use quando a tarefa do usuario corresponder a "${endpoint.operationName}".`,
 		'Se houver outra operacao com o mesmo endpoint, escolha pelo nome/efeito da Operation, nao apenas pelo metodo e path.',
 		operationRiskGuidance(endpoint),
@@ -630,12 +648,19 @@ function bodyFields(endpoint: DigisacEndpointDefinition): BodyFieldDefinition[] 
 	if (!endpoint.hasBody || !endpoint.bodyExample.trim()) return [];
 
 	return topLevelBodyFields(endpoint.bodyExample).map(({ key, sample }) => {
-		const type = bodyFieldType(key, sample);
+		// No Kanban, alguns campos têm tipo corrigido à mão (booleano escrito como `{{false}}`, posição).
+		const override = kanbanBodyOverride(endpoint, key);
+		const type = override?.type ?? bodyFieldType(key, sample);
+		// Texto do Kanban nasce vazio: o exemplo da coleção ("Em Andamento") não deve virar valor enviado.
+		const defaultValue =
+			override?.defaultValue ??
+			(isKanbanEndpoint(endpoint) && type === 'string' ? '' : defaultBodyValue(type, sample));
 		return {
 			key,
 			sample,
 			type,
-			defaultValue: defaultBodyValue(type, sample),
+			defaultValue,
+			...(override?.choices ? { choices: override.choices } : {}),
 		};
 	});
 }
@@ -656,7 +681,9 @@ function bodyFieldProperties(): INodeProperties[] {
 		(endpoint): INodeProperties => {
 			const fields = bodyFieldsByOperation.get(endpoint.id) ?? [];
 			// Valores de exemplo da documentação como padrão da coleção; constante pelo mesmo motivo do lint.
-			const fieldDefaults = bodyFieldsDefault(fields);
+			// No Kanban a coleção nasce vazia: só vai ao Digisac o campo que a pessoa adiciona (editar não
+				// pode sobrescrever posição ou nome com o exemplo da coleção).
+				const fieldDefaults = isKanbanEndpoint(endpoint) ? {} : bodyFieldsDefault(fields);
 			return {
 				displayName: 'Body Fields',
 				name: bodyFieldsParameter(endpoint),
@@ -670,7 +697,9 @@ function bodyFieldProperties(): INodeProperties[] {
 				options: fields.map((field): INodeProperties => ({
 					displayName: toTitle(field.key),
 					name: field.key,
-					type: field.type,
+					// Campo com alternativas documentadas vira lista de opções (com "Not Set" para omitir).
+					type: field.choices ? 'options' : field.type,
+					...(field.choices ? { options: choiceOptions(field.choices) } : {}),
 					default: field.defaultValue,
 					description: `Campo "${field.key}" do body para ${endpoint.method} ${endpoint.pathTemplate}. Tipo esperado: ${bodyTypeLabel(field.type)}. Exemplo da documentacao: ${compactDescription(field.sample, 180)}. ${bodyFieldSpecificGuidance(field)} Deixe vazio para omitir quando nao souber.`,
 				})),
@@ -729,11 +758,14 @@ function rawBodyProperties(): INodeProperties[] {
 export const resourceProperties: INodeProperties[] = [
 	...operationProperties(),
 	...absoluteUrlProperties(),
+	// Campos auxiliares do Kanban vêm antes dos IDs: a pessoa escolhe o quadro e depois a coluna.
+	...kanbanHelperProperties(),
 	...pathParameterProperties(),
 	...queryFieldProperties(),
 	...useRawBodyProperties(),
 	...bodyFieldProperties(),
 	...rawBodyProperties(),
+	...kanbanConfirmProperties(),
 	{
 		displayName: 'Options',
 		name: 'options',
@@ -847,11 +879,16 @@ function buildComplexQueryValue(
 ): string | undefined {
 	const values: Record<string, string> = {};
 	for (const variable of entry.variables) {
-		const value = node.getNodeParameter(fieldName('query', endpoint.id, variable), i, '') as string;
+		const raw = node.getNodeParameter(fieldName('query', endpoint.id, variable), i, '') as unknown;
+		// Na versão 2 do Kanban o quadro e a coluna chegam como Resource Locator; texto passa como está.
+		const value = typeof raw === 'object' && raw !== null ? plainValue(raw) : (raw as string);
 		if (value !== '') {
 			values[variable] = value;
 		}
 	}
+
+	// Kanban: filtro vazio sai sozinho e o resto da query continua (o genérico omitiria a query inteira).
+	if (isKanbanEndpoint(endpoint)) return kanbanQueryFromTemplate(entry.value, values);
 
 	const value = replaceTemplateValues(entry.value, values);
 	if (hasUnresolvedPlaceholders(value)) return undefined;
@@ -1008,6 +1045,18 @@ export async function executeEndpoint(
 	i: number,
 ): Promise<IDataObject | IDataObject[]> {
 	const endpoint = endpointOrThrow(this, operation);
+	// Apagar quadro, coluna ou card só segue com a confirmação ligada; a recusa vem antes de qualquer requisição.
+	const deleteNoun = kanbanDeleteNoun(endpoint);
+	if (deleteNoun && this.getNodeParameter(confirmDeleteName(endpoint.id), i, false) !== true) {
+		throw new NodeOperationError(
+			this.getNode(),
+			`Turn on 'Confirm Delete' to delete this kanban ${deleteNoun}`,
+			{
+				itemIndex: i,
+				description: `Deleting a kanban ${deleteNoun} cannot be undone. Turn on Confirm Delete to run it`,
+			},
+		);
+	}
 	const options = this.getNodeParameter('options', i, {}) as IDataObject;
 	const responseFormat = (options.responseFormat as DigisacResponseFormat) ?? 'json';
 	const endpointPath = buildEndpointPath(this, i, endpoint);
