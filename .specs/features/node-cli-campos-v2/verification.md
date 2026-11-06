@@ -46,6 +46,12 @@
 | C36 | `publicacao.test.cjs` `S5.03 generate:docs troca só o bloco entre marcadores` | no - it tests `substituirBloco`, not the `generate-docs.mjs` script that the claim names (see F9) |
 | C37 | `publicacao.test.cjs` `S5.04 publish.yml usa o stage do npm 12.2.2 com provenance` | yes - `RELEASE_MODE` and `workflow_dispatch` are matched anywhere in the file, not on the stage step |
 | C38 | `publicacao.test.cjs` `S5.06 o pacote mantém o nome n8n-nodes-digisac` | yes |
+| C39 | `seletores.test.cjs` `S3.12 busca de contato limpa o + e escapa % e _` | yes - asserta o valor exato de `qs` para telefone com +, texto misto e curinga (check anexado após o Verifier, do achado F1/F2; sem segundo Verifier) |
+| C40 | `seletores.test.cjs` `S3.13 página cheia sem acerto no filtro do node ainda devolve token` | yes - asserta `results` vazio e token `2` (achado F10) |
+| C41 | `seletores.test.cjs` `S3.14 ID de path em texto na v2 perde o espaço e número vale` | yes - asserta a URL final para `' c1 '` e `123` (achado F5) |
+| C42 | `seletores.test.cjs` `S3.15 cópias da v2 ficam invisíveis na v1` | yes - conta uma cópia por versão em cada grupo nome+onde e exige mais de 250 grupos (achado F11) |
+| C43 | `datas-opcoes.test.cjs` `S4.08 datas estritas: lixo e dia inexistente falham, Date e sem fuso valem` | yes - asserta o erro para 4 valores ruins e o ISO exato para 4 formas válidas (achado F4) |
+| C44 | `datas-opcoes.test.cjs` `S4.09 periodType open sai como openDate onde a documentação cola Date` | yes - asserta `qs.periodType` igual a `openDate` em e109 (achado F8) |
 
 ## Findings
 
