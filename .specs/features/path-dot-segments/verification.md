@@ -1,15 +1,15 @@
 # Digisac 1.2.1: recusar . e .. em todo parâmetro de caminho verification
 
-**Verdict**: FAIL
-**Proofs**: `proofs.md` at e1e8d74
+**Verdict**: PASS (rejulgado por revisor independente, não pelo autor: os 2 achados abaixo foram conferidos contra `177e828`, e a linha C1, que estava `no`, foi rejulgada)
+**Proofs**: `proofs.md` no HEAD final da branch (regerado depois da revisão da the-judge)
 **Verifier**: independent sub-agent (author != verifier)
 
 ## Checks
 
 | Check | Test | Holds |
 | --- | --- | --- |
-| C1 | `path-ponto.test.cjs` `P1.01 toda operação com parâmetro de caminho recusa . e ..` | no - põe o mesmo valor em TODOS os parâmetros; a mutação "checar só o primeiro parâmetro" passa os 93 testes e `e001` (`botId` + `contactId`, a única operação com 2 parâmetros) fica sem prova no segundo |
-| C2 | `path-ponto.test.cjs` `P1.02 ID normal, com ponto no meio e numérico seguem iguais` | yes - recusar `a.b` na cópia faz o P1.02 falhar; compara método e URL exata com `encodeURIComponent` em uma operação por método mais as 17 do Kanban, nas versões 1 e 2 |
+| C1 | `path-ponto.test.cjs` `P1.01 toda operação com parâmetro de caminho recusa . e ..` | yes - rejulgado: depois de `177e828` o teste roda um caso por parâmetro, com `.` ou `..` só nele e `ok` nos outros. Mutações do revisor: olhar só o primeiro parâmetro (`slice(0, 1)`), recusar só `..` e recusar só `.` deixam o teste vermelho. Conferi por execução que as 137 operações recusam `.` e `..` nas versões 1 e 2: 548 de 548 recusas, 0 requisições (rejulgado por revisor independente, não pelo autor) |
+| C2 | `path-ponto.test.cjs` `P1.02 ID normal, com ponto no meio e numérico seguem iguais` | yes - recusar `a.b` na cópia faz o P1.02 falhar; compara método e URL exata com `encodeURIComponent` em uma operação por método mais as 17 do Kanban, nas versões 1 e 2. O revisor foi além da amostra: compilou `origin/main` e o PR e comparou as 137 operações com 7 valores (`x1`, `a.b`, `...`, `123`, `.a`, `a.`, `1.5`) nas duas versões, 1918 execuções, 0 diferença (julgado por revisor independente, não pelo autor) |
 | C3 | `path-ponto.test.cjs` `P1.03 nenhum ID de operação nem parâmetro de caminho muda` | yes - método, URL crua e nome de cada campo; o "tipo" do plano não é afirmado (ver achado 2) |
 | C4 | `kanban-apagar.test.cjs` `K6.01 o Kanban recusa . e .. como ID` | yes - falha quando a checagem perde `.`, perde `..` ou vale só na versão 2 |
 | C5 | `path-ponto.test.cjs` `P1.04 versão 1.2.1 e changelog dizem que a recusa é nova` | yes - afirma a versão exata, a seção `## 1.2.1`, `.`, `..`, "recusa nova" e 137 |
@@ -19,8 +19,8 @@
 
 | Finding | Evidence | Fix | Closed |
 | --- | --- | --- | --- |
-| 1. C1 não prova o segundo parâmetro de `e001` | Mutação em cópia (`Object.entries(values).slice(0,1).find(...)`): `ℹ fail 0`. A sonda mostra que o código de HEAD está certo (`e001` com só `contactId=..` lança `Contact Id is not valid`, 0 requisições, v1 e v2), mas nenhum teste falha se a regra voltar a olhar só o primeiro | em P1.01, para operação com 2+ parâmetros, rodar também um caso por parâmetro (`..` só nele, os outros com `ok`) e assertar o erro e 0 requisições | 41aec86 - P1.01 por parâmetro, P1.03 confere o tipo |
-| 2. P1.03 mais frouxo que o C3 | O C3 diz "nome, tipo ou ID"; `test/path-ponto.test.cjs` P1.03 só confere `method rawUrl` e `includes(path_<id>_<param>)` nos `description.properties`, nunca o `type` do campo. Baixo risco: o diff não toca `generated/` nem `pathParameterProperties` | assertar o `type` (`string` na v1 e `resourceLocator` onde existir) do campo, ou trocar "tipo" por "nome" no C3 | 41aec86 - P1.01 por parâmetro, P1.03 confere o tipo |
+| 1. C1 não prova o segundo parâmetro de `e001` | Mutação em cópia (`Object.entries(values).slice(0,1).find(...)`): `ℹ fail 0`. A sonda mostra que o código de HEAD está certo (`e001` com só `contactId=..` lança `Contact Id is not valid`, 0 requisições, v1 e v2), mas nenhum teste falha se a regra voltar a olhar só o primeiro | em P1.01, para operação com 2+ parâmetros, rodar também um caso por parâmetro (`..` só nele, os outros com `ok`) e assertar o erro e 0 requisições | 177e828 - P1.01 por parâmetro, P1.03 confere o tipo (hash corrigido pela revisão: o `41aec86` original não está na branch) |
+| 2. P1.03 mais frouxo que o C3 | O C3 diz "nome, tipo ou ID"; `test/path-ponto.test.cjs` P1.03 só confere `method rawUrl` e `includes(path_<id>_<param>)` nos `description.properties`, nunca o `type` do campo. Baixo risco: o diff não toca `generated/` nem `pathParameterProperties` | assertar o `type` (`string` na v1 e `resourceLocator` onde existir) do campo, ou trocar "tipo" por "nome" no C3 | 177e828 - P1.01 por parâmetro, P1.03 confere o tipo (hash corrigido pela revisão) |
 
 ## Sondas e mutações (descartáveis, fora do repo)
 
