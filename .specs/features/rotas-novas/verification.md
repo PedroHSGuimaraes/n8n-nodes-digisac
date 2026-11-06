@@ -1,7 +1,7 @@
 # rotas-novas verification
 
-**Verdict**: FAIL
-**Proofs**: `proofs.md` at 16a27d6
+**Verdict**: PASS (rejulgado por revisor independente, não pelo autor: os 9 achados da tabela Findings foram conferidos contra `5d658e7`, cada correção com uma mutação que deixa um teste vermelho, e as linhas C3, C20 e C36 a C39, que estavam `no`, foram rejulgadas abaixo)
+**Proofs**: `proofs.md` no HEAD final da branch (regerado depois da rodada 2 da the-judge)
 **Verifier**: independent sub-agent (author != verifier)
 
 ## Checks
@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | C1 | `kanban-catalogo.test.cjs` `K1.01 os 298 IDs antigos continuam iguais` | yes |
 | C2 | `kanban-catalogo.test.cjs` `K1.02 os IDs novos vão de e299 a e315 na ordem da coleção` | yes |
-| C3 | `kanban-catalogo.test.cjs` `K1.03 reuseIds reaproveita o ID conhecido e numera a rota nova pelo maior ID` | no - a chave de teste varia só `rawUrl` e `sourcePath` juntos, com método fixo em `GET`; trocar `chaveDaRota` por `rawUrl` puro deixa o teste verde |
+| C3 | `kanban-catalogo.test.cjs` `K1.03 reuseIds reaproveita o ID conhecido e numera a rota nova pelo maior ID` | yes - rejulgado: depois de `5d658e7` o teste varia método e pasta. Mutação: trocar `chaveDaRota` por `rawUrl` puro deixa o teste vermelho (rejulgado por revisor independente, não pelo autor) |
 | C4 | `kanban-catalogo.test.cjs` `K1.04 as 17 rotas do Kanban têm método e caminho da documentação` | yes |
 | C5 | `kanban-catalogo.test.cjs` `K1.05 o gerador põe /api nos PUT do Kanban e não mexe em /v1/cards` | yes |
 | C6 | `kanban-catalogo.test.cjs` `K1.06 o build não chama o gerador` | yes |
@@ -27,7 +27,7 @@
 | C17 | `kanban-operacoes.test.cjs` `K2.11 buscar card chama o caminho com o ID` | yes |
 | C18 | `kanban-operacoes.test.cjs` `K2.12 criar card envia coluna e chamado` | yes |
 | C19 | `kanban-operacoes.test.cjs` `K2.13 editar card envia a posição como número só quando adicionada` | yes |
-| C20 | `kanban-operacoes.test.cjs` `K2.14 reordenar card envia os quatro campos` | no - o check diz quatro campos e o teste envia três (`beforeCardId`, `columnId`, `moveTo`); `afterCardId` nunca passa pelo `execute` |
+| C20 | `kanban-operacoes.test.cjs` `K2.14 reordenar card envia os quatro campos` | yes - rejulgado: o teste agora envia os quatro campos, com `afterCardId` (`5d658e7`). Mutação: tirar `afterCardId` de `CARD_BODY_KEYS` deixa o teste vermelho (rejulgado por revisor independente, não pelo autor) |
 | C21 | `kanban-operacoes.test.cjs` `K2.15 ID de path vazio lança o erro do campo certo` | yes |
 | C22 | `kanban-operacoes.test.cjs` `K2.16 erros do Digisac viram NodeApiError com o código HTTP` | yes |
 | C23 | `kanban-apagar.test.cjs` `K3.01 as três operações de apagar têm o campo Confirm Delete` | yes |
@@ -43,11 +43,13 @@
 | C33 | `kanban-seletores.test.cjs` `K4.05 os campos auxiliares existem só na versão 2 e não saem na requisição` | yes |
 | C34 | `kanban-seletores.test.cjs` `K4.06 o 401 do Digisac nas três listas vira NodeApiError` | yes |
 | C35 | `kanban-seletores.test.cjs` `K4.07 a versão 2 lê list e id e tira o espaço das pontas` | yes |
-| C36 | `kanban-docs.test.cjs` `K5.01 a versão 1 vê as operações novas com campos de texto` | no - o teste prova só a metade das 17 novas; a metade "todo parâmetro das 298 mantém `name` e `type`" não é afirmada aqui (está em `versao1.test.cjs` S2.03, que a prova não seleciona e que agora filtra as operações novas das listas `operation`) |
-| C37 | `kanban-docs.test.cjs` `K5.02 a versão do pacote e o changelog dizem 1.2.0` | no - o `CHANGELOG.md` só precisa conter `## 1.2.0` e a palavra `Kanban` em qualquer lugar; as 17 operações, a numeração estável e a confirmação não são afirmadas |
-| C38 | `kanban-docs.test.cjs` `K5.03 o README documenta o Kanban` | no - "exemplo de apagar com confirmação" e "seção de Tool de IA" passam por `Confirm Delete` e `Tool de IA` em qualquer linha do README (a linha 19 já basta) |
-| C39 | `kanban-docs.test.cjs` `K5.04 a documentação gerada lista 315 chamadas` | no - `/315/` casa com a linha da tabela `e315`; apagar o "Total de chamadas documentadas: 315" não derruba o teste, e a tabela de recursos do README não é lida |
+| C36 | `kanban-docs.test.cjs` `K5.01 a versão 1 vê as operações novas com campos de texto` | yes - rejulgado: a segunda prova passou a ser `versao1.test.cjs` S2.03 (`5d658e7`). Conferi por conta própria com o build de `origin/main` e o do PR: 854 de 856 propriedades idênticas; as duas que mudam só crescem (a lista `resource` ganha `general_kanban` e o `useRawBodyJson` ganha 9 IDs de operação). A conta do autor, "589 de 590", não reproduziu, mas a conclusão vale (rejulgado por revisor independente, não pelo autor) |
+| C37 | `kanban-docs.test.cjs` `K5.02 a versão do pacote e o changelog dizem 1.2.0` | yes - rejulgado: o teste lê só a seção 1.2.0 e exige `17 operações`, `e299` e `Confirm Delete` (`5d658e7`); a rodada 2 acrescentou a suposição do `/api` e do `position` (K6.02). Limite: a frase "IDs de operação estáveis" não é travada, só o `e299` (rejulgado por revisor independente, não pelo autor) |
+| C38 | `kanban-docs.test.cjs` `K5.03 o README documenta o Kanban` | yes - rejulgado: o teste lê cada seção (`5d658e7`). Mutações: renomear o título `Excluir card com confirmação` e trocar `Kanban como tool` deixam o teste vermelho (rejulgado por revisor independente, não pelo autor) |
+| C39 | `kanban-docs.test.cjs` `K5.04 a documentação gerada lista 315 chamadas` | yes - rejulgado: o teste lê a linha `Total de chamadas documentadas: 315` (`5d658e7`). Mutação: trocar por 314 deixa o teste vermelho (rejulgado por revisor independente, não pelo autor) |
 | C40 | `npm test` resumo `ℹ fail 0` e as três linhas `Build` de `proofs.md` (lint, tsc, build) | yes |
+| C41 | `kanban-apagar.test.cjs` `K6.01 o Kanban recusa . e .. como ID` | yes - escrito pelo revisor na rodada 2 (achado F2 da the-judge); visto vermelho antes e verde depois. Cobre as 17 operações, `.` e `..`, nas versões 1 e 2. Mutação: trocar a condição da guarda por `false` deixa o teste vermelho. O teste irmão prova que uma operação antiga segue enviando `..` como antes (julgado por revisor independente, não pelo autor) |
+| C42 | `kanban-docs.test.cjs` `K6.02 README e CHANGELOG avisam as suposições` | yes - escrito pelo revisor na rodada 2 (achados F1 e F3); visto vermelho antes e verde depois. Lê a seção Kanban do README e a seção 1.2.0 do CHANGELOG (julgado por revisor independente, não pelo autor) |
 
 ## Findings
 
