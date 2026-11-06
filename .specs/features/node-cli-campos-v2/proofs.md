@@ -1,6 +1,6 @@
 # node-cli-campos-v2 proofs
 
-**HEAD**: 136d0ce
+**HEAD**: 9af40de
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 47 pass, 0 fail
@@ -61,12 +61,12 @@
 
 ```
 ▶ versão 1 do node
-  ✔ S2.01a v1 envia o POST de e001 com query e timeout (2.663555ms)
-  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (0.85097ms)
-  ✔ S2.02 v1 vazio lança erro de parâmetro de path (1.362435ms)
-  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (1.58255ms)
-  ✔ S2.04 formato texto devolve data com o texto (0.582049ms)
-✔ versão 1 do node (7.869579ms)
+  ✔ S2.01a v1 envia o POST de e001 com query e timeout (2.916465ms)
+  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (0.932956ms)
+  ✔ S2.02 v1 vazio lança erro de parâmetro de path (1.505817ms)
+  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (2.040822ms)
+  ✔ S2.04 formato texto devolve data com o texto (0.820369ms)
+✔ versão 1 do node (9.070946ms)
 ℹ tests 43
 ℹ suites 8
 ℹ pass 43
@@ -74,7 +74,7 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 467.923839
+ℹ duration_ms 905.421659
 ```
 
 `npm run lint --silent` - exit 0
