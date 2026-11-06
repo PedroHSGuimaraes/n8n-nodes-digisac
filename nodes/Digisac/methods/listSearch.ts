@@ -19,6 +19,8 @@ import type {
 	INodeListSearchResult,
 } from 'n8n-workflow';
 
+import { filterBoardName, filterColumnName } from '../helpers/kanban';
+import { plainValue } from '../helpers/resourceLocator';
 import { digisacApiRequest } from '../transport';
 
 /**
@@ -106,7 +108,80 @@ function contactFilter(text: string): IDataObject {
 		: { 'where[name][$iLike]': `%${escapeLike(text)}%` };
 }
 
+// ---------------------------------------------------------------------------------------------
+// Kanban (plano rotas-novas, S4)
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Lê o valor de um campo auxiliar da operação aberta no editor (ex.: `filterBoard_e305`).
+ * Devolve texto vazio quando a pessoa ainda não escolheu nada ou quando não há operação aberta.
+ */
+function helperValue(context: ILoadOptionsFunctions, name: (operationId: string) => string): string {
+	const operation = plainValue(context.getCurrentNodeParameter('operation'));
+	return operation ? plainValue(context.getCurrentNodeParameter(name(operation))) : '';
+}
+
+/** Rótulo do card: a coleção não documenta o nome, então vale o contato do chamado, senão o ID. */
+function cardLabel(item: IDataObject): string {
+	const contact = (item.ticket as IDataObject | undefined)?.contact as IDataObject | undefined;
+	return String(contact?.name ?? item.id);
+}
+
+/**
+ * Cria o método de busca de uma listagem do Kanban.
+ * Essas três listagens da coleção usam o parâmetro `query` em JSON com `paginate:false`: a API
+ * devolve tudo numa chamada, então não há `paginationToken` e o texto filtra no node, sem acento.
+ * @param endpoint rota de listagem em `/api/v1/`.
+ * @param buildQuery monta o JSON da query a partir dos campos auxiliares; `undefined` evita a chamada.
+ * @param label rótulo de cada item da lista.
+ */
+function kanbanSearch(
+	endpoint: string,
+	buildQuery: (context: ILoadOptionsFunctions) => IDataObject | undefined,
+	label: (item: IDataObject) => string = labelOf,
+) {
+	return async function (this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+		const query = buildQuery(this);
+		// Sem o filtro obrigatório (card sem coluna) a lista fica vazia e a API nem é chamada.
+		if (!query) return { results: [] };
+
+		const response = await digisacApiRequest.call(this, 'GET', endpoint, {}, {
+			query: JSON.stringify(query),
+		});
+		const needle = normalize(filter ?? '');
+		const items = extractItems(response).filter(
+			(item) => !needle || normalize(label(item)).includes(needle),
+		);
+		return { results: items.map((item) => ({ name: label(item), value: String(item.id) })) };
+	};
+}
+
 export const listSearch = {
+	// Quadros: lista fixa da documentação, sem filtro por quadro.
+	searchKanbanBoards: kanbanSearch('/api/v1/kanban-boards', () => ({
+		paginate: false,
+		withTotal: false,
+	})),
+	// Colunas: estreitadas pelo quadro do campo auxiliar; sem quadro, lista as colunas de todos.
+	searchKanbanColumns: kanbanSearch('/api/v1/kanban-columns', (context) => {
+		const board = helperValue(context, filterBoardName);
+		return {
+			paginate: false,
+			withTotal: false,
+			...(board ? { where: { kanbanBoardId: board } } : {}),
+		};
+	}),
+	// Cards: a documentação só filtra por coluna, então sem coluna escolhida a lista fica vazia.
+	searchKanbanCards: kanbanSearch(
+		'/api/v1/kanban-cards',
+		(context) => {
+			const column = helperValue(context, filterColumnName);
+			return column
+				? { where: { columnId: column }, paginate: false, withTotal: false }
+				: undefined;
+		},
+		cardLabel,
+	),
 	searchContacts: pagedSearch('/api/v1/contacts', contactFilter),
 	searchServices: pagedSearch('/api/v1/services'),
 	searchDepartments: pagedSearch('/api/v1/departments'),

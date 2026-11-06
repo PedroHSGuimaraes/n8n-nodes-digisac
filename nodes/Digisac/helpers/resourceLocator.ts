@@ -22,6 +22,7 @@ import type {
 import { NodeOperationError } from 'n8n-workflow';
 
 import { toTitle } from './format';
+import { isKanbanOperation, KANBAN_BODY_ID_KEYS } from './kanban';
 import { guideBodyChild } from './valoresGuiados';
 import { FROM_VERSION_2, withVersion } from './versao';
 
@@ -46,14 +47,36 @@ export const LISTED_ID_TYPES: Record<string, ListedIdType> = {
 	roleId: { noun: 'role', search: 'searchRoles' },
 	botId: { noun: 'bot', search: 'searchBots' },
 	ticketTopicId: { noun: 'ticket topic', search: 'searchTicketTopics' },
+	// Kanban (plano rotas-novas): quadro, coluna e card. As chaves extras são nomes de campo do body;
+	// só valem nas operações do Kanban (ver `isKanbanOperation` abaixo), então nada antigo muda.
+	boardId: { noun: 'board', search: 'searchKanbanBoards' },
+	kanbanBoardId: { noun: 'board', search: 'searchKanbanBoards' },
+	columnId: { noun: 'column', search: 'searchKanbanColumns' },
+	cardsDestinationColumnId: { noun: 'column', search: 'searchKanbanColumns' },
+	beforeColumnId: { noun: 'column', search: 'searchKanbanColumns' },
+	afterColumnId: { noun: 'column', search: 'searchKanbanColumns' },
+	cardId: { noun: 'card', search: 'searchKanbanCards' },
+	beforeCardId: { noun: 'card', search: 'searchKanbanCards' },
+	afterCardId: { noun: 'card', search: 'searchKanbanCards' },
 };
 
 /** Padrões de nome gerados por `actions/index.ts` (prefixo, id da operação e parâmetro). */
 const PATH_NAME = /^path_e\d+_(.+)$/;
 /** Filtro de query de ID: `queryKey_e063_where_serviceId_` ou `queryKey_e101_serviceId`. */
 const QUERY_ID_NAME = /^queryKey_e\d+_(?:where_)?(contactId|serviceId|departmentId|userId)_?$/;
-/** Chaves de ID que o Campos do Body (Body Fields) pode guiar. */
+/**
+ * Placeholder de quadro ou coluna dentro da query JSON dos `Listar` do Kanban (`query_e304_boardId`).
+ * Só o Kanban entra: nas outras operações o placeholder de query complexa continua texto (plano antigo).
+ */
+const KANBAN_QUERY_NAME = /^query_(e\d+)_(boardId|columnId)$/;
+/** Chaves de ID que o Campos do Body (Body Fields) pode guiar nas operações antigas. */
 const BODY_ID_KEYS = new Set(['contactId', 'serviceId', 'departmentId', 'userId']);
+
+/** Chaves de ID do body de uma coleção `bodyFields_<op>_fields`: as antigas, mais as do Kanban nas dele. */
+function bodyIdKeysFor(collectionName: string): Set<string> {
+	const operationId = /^bodyFields_(e\d+)_/.exec(collectionName)?.[1] ?? '';
+	return isKanbanOperation(operationId) ? new Set([...BODY_ID_KEYS, ...KANBAN_BODY_ID_KEYS]) : BODY_ID_KEYS;
+}
 
 /** Monta o Resource Locator de um tipo com lista (modos `list` e `id`). */
 function listedLocator(
@@ -120,7 +143,9 @@ export function withGuidedIds(properties: INodeProperties[]): INodeProperties[] 
 
 		const pathType = PATH_NAME.exec(property.name)?.[1];
 		const queryType = QUERY_ID_NAME.exec(property.name)?.[1];
-		const idType = pathType ?? queryType;
+		const kanbanQuery = KANBAN_QUERY_NAME.exec(property.name);
+		const kanbanQueryType = kanbanQuery && isKanbanOperation(kanbanQuery[1]) ? kanbanQuery[2] : undefined;
+		const idType = pathType ?? queryType ?? kanbanQueryType;
 		if (!idType) return [property];
 
 		const legacy: INodeProperties = {
@@ -145,15 +170,16 @@ export function withGuidedIds(properties: INodeProperties[]): INodeProperties[] 
 /** Copia uma coleção de Campos do Body e troca os filhos de ID por Resource Locator na cópia v2. */
 function guideBodyCollection(collection: INodeProperties): INodeProperties[] {
 	const options = (collection.options ?? []) as INodeProperties[];
+	const idKeys = bodyIdKeysFor(collection.name);
 	// A coleção ganha cópia da versão 2 quando tem algum ID ou o campo origin para guiar.
-	if (!options.some((child) => BODY_ID_KEYS.has(child.name) || guideBodyChild(child))) {
+	if (!options.some((child) => idKeys.has(child.name) || guideBodyChild(child))) {
 		return [collection];
 	}
 
 	const guidedChildren = options.map((child) => {
 		const valor = guideBodyChild(child);
 		if (valor) return valor;
-		if (!BODY_ID_KEYS.has(child.name)) return child;
+		if (!idKeys.has(child.name)) return child;
 		return listedLocator(
 			child,
 			child.displayName,
@@ -165,7 +191,7 @@ function guideBodyCollection(collection: INodeProperties): INodeProperties[] {
 	const guidedDefault = Object.fromEntries(
 		Object.entries((collection.default ?? {}) as Record<string, unknown>).map(([key, value]) => [
 			key,
-			BODY_ID_KEYS.has(key) ? { mode: 'list', value: '' } : value,
+			idKeys.has(key) ? { mode: 'list', value: '' } : value,
 		]),
 	);
 	return [
