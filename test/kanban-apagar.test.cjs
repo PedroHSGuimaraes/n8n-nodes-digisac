@@ -56,8 +56,7 @@ function visivelNa(propriedade, versao) {
 	if (condicao === undefined) return true;
 	return condicao.some(
 		(c) =>
-			c === versao ||
-			(typeof c === 'object' && c._cnd?.gte !== undefined && c._cnd.gte <= versao),
+			c === versao || (typeof c === 'object' && c._cnd?.gte !== undefined && c._cnd.gte <= versao),
 	);
 }
 // Procura a cópia de um parâmetro visível numa versão, pelo nome.
@@ -84,7 +83,8 @@ describe('apagar com confirmação', () => {
 			assert.deepEqual(campo.displayOptions.show.operation, [operacao]);
 			// O aviso fica na descrição da operação, que é o que a pessoa lê ao escolher (padrão do RD Conversas).
 			const operacoes = propriedades.find(
-				(p) => p.name === 'operation' && p.displayOptions?.show?.resource?.includes('general_kanban'),
+				(p) =>
+					p.name === 'operation' && p.displayOptions?.show?.resource?.includes('general_kanban'),
 			);
 			const opcao = operacoes.options.find((o) => o.value === operacao);
 			assert.match(opcao.description, /^Warning:/, operacao);
@@ -96,9 +96,16 @@ describe('apagar com confirmação', () => {
 		for (const [operacao, substantivo, campo] of APAGAR) {
 			// Desligado e ausente (valor padrão do n8n) são o mesmo caso: recusa.
 			for (const confirmacao of [{ [`confirmDelete_${operacao}`]: false }, {}]) {
-				const contexto = criarContexto(2, { operation: operacao, [campo]: lista('x1'), ...confirmacao });
+				const contexto = criarContexto(2, {
+					operation: operacao,
+					[campo]: lista('x1'),
+					...confirmacao,
+				});
 				await assert.rejects(new Digisac().execute.call(contexto), (erro) => {
-					assert.equal(erro.message, `Turn on 'Confirm Delete' to delete this kanban ${substantivo}`);
+					assert.equal(
+						erro.message,
+						`Turn on 'Confirm Delete' to delete this kanban ${substantivo}`,
+					);
 					return true;
 				});
 				assert.equal(contexto.requisicoes.length, 0, `${operacao}: não pode haver requisição`);
@@ -139,7 +146,9 @@ describe('apagar com confirmação', () => {
 	});
 
 	it('K3.06 as outras DELETE do catálogo não pedem confirmação', async () => {
-		const outras = DIGISAC_ENDPOINTS.filter((e) => e.method === 'DELETE' && !IDS_KANBAN.includes(e.id));
+		const outras = DIGISAC_ENDPOINTS.filter(
+			(e) => e.method === 'DELETE' && !IDS_KANBAN.includes(e.id),
+		);
 		assert.ok(outras.length > 5, 'o catálogo tem várias DELETE antigas');
 		for (const endpoint of outras) {
 			assert.equal(
@@ -157,5 +166,46 @@ describe('apagar com confirmação', () => {
 				assert.equal(req.method, 'DELETE', `${antiga.id} v${versao}`);
 			}
 		}
+	});
+});
+
+describe('ID que escapa da rota (achado F2 da the-judge)', () => {
+	it('K6.01 o Kanban recusa . e .. como ID', async () => {
+		// "." e ".." passam pelo encodeURIComponent e o URL os resolve para fora do recurso
+		// (DELETE /kanban-boards/.. viraria uma chamada à raiz da API). Vale para as 17 operações.
+		for (const [id, , , nome] of KANBAN) {
+			const endpoint = DIGISAC_ENDPOINTS.find((e) => e.id === id);
+			for (const parametro of endpoint.pathParams) {
+				for (const ponto of ['.', '..']) {
+					for (const versao of [1, 2]) {
+						const valor = versao === 2 ? { mode: 'id', value: ponto } : ponto;
+						const contexto = criarContexto(versao, {
+							operation: id,
+							[`path_${id}_${parametro}`]: valor,
+							[`confirmDelete_${id}`]: true,
+						});
+						await assert.rejects(
+							new Digisac().execute.call(contexto),
+							/is not valid/,
+							`${nome} ${parametro}=${ponto} v${versao}`,
+						);
+						assert.equal(contexto.requisicoes.length, 0, `${nome} ${parametro}=${ponto}`);
+					}
+				}
+			}
+		}
+	});
+
+	it('K6.01 as operações antigas não mudam com ponto no ID', async () => {
+		// Decisão do Jev (0,87): a recusa vale só para o Kanban; workflow salvo das 298 antigas fica igual.
+		const antiga = DIGISAC_ENDPOINTS.find(
+			(e) => !KANBAN.some(([id]) => id === e.id) && e.method === 'GET' && e.pathParams.length === 1,
+		);
+		const contexto = criarContexto(1, {
+			operation: antiga.id,
+			[`path_${antiga.id}_${antiga.pathParams[0]}`]: '..',
+		});
+		await new Digisac().execute.call(contexto);
+		assert.equal(contexto.requisicoes.length, 1);
 	});
 });

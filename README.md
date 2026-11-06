@@ -90,6 +90,7 @@ O resource **Kanban (General)** tem 17 operações, três por tipo mais as de or
 - **Escolha em cascata (versão 2).** Em operações que pedem uma coluna, o campo **Filter by Board** estreita a lista de colunas a um quadro. Em operações que pedem um card, o campo **Filter by Column** mostra os cards daquela coluna. Esses dois campos só ajudam a escolher: o node não os envia ao Digisac. Sem a coluna escolhida, a lista de cards fica vazia; cole o ID no modo **By ID** se já o tem.
 - **Excluir exige confirmação.** **Excluir quadro**, **Excluir coluna** e **Excluir card** têm o campo **Confirm Delete**, desligado por padrão. Sem ele ligado, o node para antes de chamar a API.
 - **Body Fields começa vazio.** Em criar e editar, adicione só os campos que quer enviar. Assim, editar um card não sobrescreve a posição, e editar um quadro não troca os departamentos.
+- **Duas suposições sem chamada real.** A coleção do Digisac traz **Editar coluna** e **Editar card** como `/v1/...`, sem `/api`. O node usa `/api/v1/kanban-columns/...` e `/api/v1/kanban-cards/...`, como as outras 15 rotas. Se essas duas operações responderem `404`, o caminho da coleção é o certo; abra uma issue. Também por suposição, `Position` (editar card) vai como número, e a coleção mostra `"1"` entre aspas.
 - **Versão 1.** Quem usa a versão 1 vê as mesmas 17 operações com campos de texto, sem a lista pesquisável.
 
 ### Todas as chamadas da API

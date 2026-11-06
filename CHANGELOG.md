@@ -6,6 +6,8 @@
 - **Quadro, coluna e card em lista pesquisável (versão 2 do node).** Os campos **Filter by Board** e **Filter by Column** estreitam a lista de colunas e de cards; o node não os envia ao Digisac. Na versão 1 as operações novas usam campos de texto.
 - **Excluir exige confirmação.** **Excluir quadro**, **Excluir coluna** e **Excluir card** têm o campo **Confirm Delete**, desligado por padrão. Sem ele o node falha antes de qualquer requisição.
 - **IDs de operação estáveis.** O gerador `generate:endpoints` lê o catálogo versionado e mantém o ID de cada rota conhecida. As 17 rotas novas levam `e299` a `e315`. Sem essa regra, as 17 rotas inseridas no meio da coleção trocariam o ID de 148 operações e os workflows salvos chamariam outra rota.
+- **Quadro, coluna e card recusam `.` e `..` como ID.** O URL resolve esses valores para fora do recurso (`DELETE /kanban-boards/..` cairia na raiz da API). As 298 operações antigas não mudam.
+- **Segunda suposição:** o campo `position` de **Editar card** vai como número, e a coleção mostra `"1"` entre aspas.
 - **Suposição a confirmar com uma chamada real.** A coleção traz os dois `PUT` do Kanban (editar coluna e editar card) como `/v1/...`, sem `/api`. O node usa `/api/v1/...`, como as outras rotas. Se o Digisac responder `404`, o caminho da coleção é o certo.
 
 ## 1.1.0

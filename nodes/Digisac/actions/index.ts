@@ -836,6 +836,16 @@ function buildEndpointPath(
 	endpoint: DigisacEndpointDefinition,
 ): string {
 	const values = collectPathValues(node, i, endpoint);
+	// Kanban: "." e ".." não são IDs. O URL os resolve para fora do recurso (DELETE /kanban-boards/..
+	// cairia na raiz da API). Vale só para o Kanban: as 298 operações antigas seguem como estavam.
+	if (isKanbanEndpoint(endpoint)) {
+		const invalid = Object.entries(values).find(([, value]) => value === '.' || value === '..');
+		if (invalid) {
+			throw new NodeOperationError(node.getNode(), `${toTitle(invalid[0])} is not valid`, {
+				itemIndex: i,
+			});
+		}
+	}
 	const path = replaceTemplateVariables(endpoint.pathTemplate, values);
 
 	if (path.includes('{{')) {

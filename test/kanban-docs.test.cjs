@@ -56,8 +56,7 @@ function visivelNa(propriedade, versao) {
 	if (condicao === undefined) return true;
 	return condicao.some(
 		(c) =>
-			c === versao ||
-			(typeof c === 'object' && c._cnd?.gte !== undefined && c._cnd.gte <= versao),
+			c === versao || (typeof c === 'object' && c._cnd?.gte !== undefined && c._cnd.gte <= versao),
 	);
 }
 // Procura a cópia de um parâmetro visível numa versão, pelo nome.
@@ -97,6 +96,20 @@ describe('compatibilidade e documentação', () => {
 		assert.match(secao, /17 operações/);
 		assert.match(secao, /e299/);
 		assert.match(secao, /Confirm Delete/);
+	});
+
+	it('K6.02 README e CHANGELOG avisam as suposições', () => {
+		// Suposições sem chamada real: `/api` nos dois PUT e `position` como número (achados F1 e F3).
+		const readme = fs.readFileSync(path.join(raiz, 'README.md'), 'utf8');
+		const secaoReadme =
+			readme.split(/^#{2,3} /m).find((b) => b.startsWith('Kanban (quadros')) ?? '';
+		assert.match(secaoReadme, /\/api\/v1\/kanban-columns/);
+		assert.match(secaoReadme, /404/);
+		assert.match(secaoReadme, /`Position`.*número/);
+		const changelog = fs.readFileSync(path.join(raiz, 'CHANGELOG.md'), 'utf8');
+		const secao = changelog.split(/^## /m).find((bloco) => bloco.startsWith('1.2.0')) ?? '';
+		assert.match(secao, /sem `\/api`/);
+		assert.match(secao, /`position`.*número/);
 	});
 
 	it('K5.03 o README documenta o Kanban', () => {

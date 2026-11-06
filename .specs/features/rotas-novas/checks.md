@@ -6,7 +6,7 @@ Plan: `.specs/features/rotas-novas/plan.md`
 
 ## Intent
 
-40 checks in 5 slices · 4 one-way doors · 0 open, 0 block
+42 checks in 5 slices · 4 one-way doors · 0 open, 0 block
 
 ## Checks
 
@@ -140,6 +140,12 @@ Proof: run unit | ✔ K5.04 a documentação gerada lista 315 chamadas
 
 **C40** - Lint, tsc, build e a suíte saem com código 0 (S5 AC 5)
 Proof: run unit | ℹ fail 0
+
+**C41** - As 17 operações do Kanban recusam `.` e `..` como ID de path com `NodeOperationError` antes da requisição; as operações antigas não mudam (achado F2 da the-judge)
+Proof: run unit | ✔ K6.01 o Kanban recusa . e .. como ID
+
+**C42** - O README e o CHANGELOG avisam a suposição do `/api` nos dois `PUT` e a do `position` numérico (achados F1 e F3 da the-judge)
+Proof: run unit | ✔ K6.02 README e CHANGELOG avisam as suposições
 
 ## Coverage
 
