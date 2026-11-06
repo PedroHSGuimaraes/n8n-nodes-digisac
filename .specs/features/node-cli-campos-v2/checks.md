@@ -184,7 +184,7 @@ Proof: run unit | ✔ S5.06 o pacote mantém o nome
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** Verifier (fresh sub-agent, haiku/sonnet) a partir do HEAD e1aae30, rodada 1
-- **Boundary:** C1-C38 fechados em e1aae30 (41 provas verdes em check_proofs.py)
+- **Dispatched:** Verifier (sonnet) no HEAD e1aae30, rodada 1: returned (FAIL, 11 achados, fechados em a3e9cd2)
+- **Boundary:** C1-C44 fechados em a3e9cd2
 - **Abandoned:** none
 - **Pending (fora do brief):** S5 AC 5, a tag `v1.1.0` e a aprovação do npm; o brief proíbe tag e publicação, então o dono cria a tag depois do merge
