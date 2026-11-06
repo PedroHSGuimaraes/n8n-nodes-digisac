@@ -163,7 +163,7 @@ GET /api/v1/me
 3. Escolha a **Operation**. Cada operation corresponde a uma chamada real da API.
 4. Preencha os campos obrigatórios de path, como \`contactId\`, \`ticketId\`, \`serviceId\`, \`messageId\`, \`userId\`, \`campaignId\`.
 5. Preencha os campos de query que aparecerem, como \`Per Page\`, \`Number\`, \`Service Id\`, \`Start Period\`, \`End Period\`, \`Status\`.
-6. Em chamadas \`POST\`, \`PUT\` e \`PATCH\`, use **Campos do Body**. O node gera esses campos a partir do body documentado pela Digisac.
+6. Em chamadas \`POST\`, \`PUT\` e \`PATCH\`, use **Body Fields**. O node gera esses campos a partir do body documentado pela Digisac.
 7. Use **Body JSON Avançado** somente quando a operação exigir array, objeto livre ou uma estrutura que não coube nos campos gerados.
 8. Use **Options -> Query Avançada JSON** somente para filtros muito específicos não representados por campos.
 9. Em exports CSV/TXT/PDF, se a resposta não vier como JSON, use **Options -> Response Format -> Text**.
@@ -180,7 +180,7 @@ Regra para AI Tools e automações: qualquer campo terminado em \`Id\` ou \`Ids\
 | **Operation** | Chamada exata da API. A descrição mostra método, endpoint, origem na documentação e placeholders. |
 | **Path Parameters** | Campos obrigatórios extraídos de placeholders como \`{{contactId}}\`. |
 | **Campos de query** | Campos simples gerados a partir da URL documentada. Exemplos: \`Per Page\`, \`Number\`, \`Service Id\`, \`From\`, \`To\`, \`Type\`. |
-| **Campos do Body** | Coleção de campos gerada a partir do body documentado para operações de escrita. Use antes de qualquer JSON manual. |
+| **Body Fields** | Coleção de campos gerada a partir do body documentado para operações de escrita. Use antes de qualquer JSON manual. |
 | **Use Body JSON Avançado** | Toggle para liberar um editor JSON quando a chamada precisa de array, objeto livre ou payload muito específico. |
 | **Options -> Query Avançada JSON** | Objeto JSON livre mesclado na query string. Chaves iguais substituem campos gerados; use apenas quando a chamada precisar de filtro não representado por campo. |
 | **Options -> Response Format** | Use \`Text\` para exportações CSV/TXT/PDF ou respostas que não retornam JSON. |
@@ -211,7 +211,7 @@ Preencha:
 Resource: **Mensagens (General)**  
 Operation: **Enviar mensagem**
 
-Em **Campos do Body**, preencha:
+Em **Body Fields**, preencha:
 
 - \`Text\`: \`Olá, tudo bem?\`
 - \`Type\`: \`chat\`
@@ -224,7 +224,7 @@ Em **Campos do Body**, preencha:
 Resource: **Mensagens (General)**  
 Operation: **Enviar imagem**, **Enviar PDF** ou **Enviar áudio**
 
-Use **Campos do Body** para \`Text\`, \`Number\` e \`Service Id\`. No campo \`File\`, informe somente o objeto do arquivo, não o body inteiro:
+Use **Body Fields** para \`Text\`, \`Number\` e \`Service Id\`. No campo \`File\`, informe somente o objeto do arquivo, não o body inteiro:
 
 \`\`\`json
 {
@@ -263,7 +263,7 @@ Body:
 Resource: **Chamados (General)**  
 Operation: **Fechar um chamado com assunto**
 
-Em **Campos do Body**, preencha \`Ticket Topic Ids\` com:
+Em **Body Fields**, preencha \`Ticket Topic Ids\` com:
 
 \`\`\`json
 ["TICKET_TOPIC_ID"]
@@ -288,7 +288,7 @@ Preencha os campos de query:
 Resource: **Webhooks (General)**  
 Operation: **Criar webhook**
 
-Em **Campos do Body**, preencha \`Active\`, \`Name\`, \`Url\`, \`Events\` e \`Type\`. Para \`Events\`, use array JSON:
+Em **Body Fields**, preencha \`Active\`, \`Name\`, \`Url\`, \`Events\` e \`Type\`. Para \`Events\`, use array JSON:
 
 \`\`\`json
 ["message.created", "ticket.closed"]
@@ -321,7 +321,7 @@ Você pode usar as tools Digisac somente quando o usuário pedir para consultar,
 Nunca invente IDs. Qualquer campo terminado em Id ou Ids deve vir de busca/listagem anterior, entrada confirmada do usuário ou valor sentinela documentado como all.
 Não copie placeholders da documentação, como {{contactId}}, {{serviceId}} ou {{all/open/close}}. Substitua por valor real ou escolha uma opção válida.
 Para operações POST, PUT e PATCH, envie um body JSON mínimo, somente com os campos necessários.
-Quando a tool expuser Campos do Body, preencha os campos dedicados em vez de gerar um JSON manual.
+Quando a tool expuser Body Fields, preencha os campos dedicados em vez de gerar um JSON manual.
 Use Body JSON Avançado ou Query Avançada JSON apenas quando não existir campo dedicado suficiente para a chamada.
 Para filtros de data/hora, use ISO-8601 quando o endpoint esperar timestamp.
 Para exportações CSV, TXT ou PDF, use Response Format = Text se a resposta não for JSON.

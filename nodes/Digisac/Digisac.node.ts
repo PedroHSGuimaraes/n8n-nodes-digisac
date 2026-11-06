@@ -9,6 +9,10 @@ import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { executeEndpoint, resourceOptions, resourceProperties } from './actions';
 
+// Valor padrão do campo Resource: a primeira pasta do catálogo. Fica numa constante
+// para o lint enxergar um `default` simples (a regra não avalia expressão com `??`).
+const defaultResource: string = resourceOptions[0]?.value?.toString() ?? '';
+
 export class Digisac implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Digisac',
@@ -27,7 +31,7 @@ export class Digisac implements INodeType {
 		usableAsTool: {
 			replacements: {
 				description:
-					'Ferramenta para executar chamadas documentadas da API Digisac dentro do n8n. Use somente para tarefas de Digisac, como consultar, criar ou alterar contatos, chamados, mensagens, campanhas, conexoes, departamentos, usuarios, tags, templates, webhooks, relatorios e estatisticas. Primeiro escolha Resource e Operation; a Operation informa metodo HTTP, endpoint, origem na documentacao, parametros obrigatorios, query e body. Nunca invente IDs: qualquer campo terminado em Id ou Ids deve vir de busca/listagem anterior, entrada confirmada do usuario ou valor sentinela documentado como all. Preencha campos dedicados de path, query e Campos do Body; deixe campos vazios quando nao souber. Nao copie placeholders da documentacao como {{contactId}} ou {{all/open/close}}; substitua por valor real ou escolha uma opcao valida. Use Query Avancada JSON ou Body JSON Avancado apenas quando nao existir campo dedicado suficiente. Antes de enviar mensagem, excluir, arquivar, bloquear, fechar chamado, transferir chamado ou alterar dados, confirme que a intencao do usuario esta explicita.',
+					'Ferramenta para executar chamadas documentadas da API Digisac dentro do n8n. Use somente para tarefas de Digisac, como consultar, criar ou alterar contatos, chamados, mensagens, campanhas, conexoes, departamentos, usuarios, tags, templates, webhooks, relatorios e estatisticas. Primeiro escolha Resource e Operation; a Operation informa metodo HTTP, endpoint, origem na documentacao, parametros obrigatorios, query e body. Nunca invente IDs: qualquer campo terminado em Id ou Ids deve vir de busca/listagem anterior, entrada confirmada do usuario ou valor sentinela documentado como all. Preencha campos dedicados de path, query e Body Fields; deixe campos vazios quando nao souber. Nao copie placeholders da documentacao como {{contactId}} ou {{all/open/close}}; substitua por valor real ou escolha uma opcao valida. Use Query Avancada JSON ou Body JSON Avancado apenas quando nao existir campo dedicado suficiente. Antes de enviar mensagem, excluir, arquivar, bloquear, fechar chamado, transferir chamado ou alterar dados, confirme que a intencao do usuario esta explicita.',
 			},
 		},
 		credentials: [
@@ -43,7 +47,7 @@ export class Digisac implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: resourceOptions,
-				default: resourceOptions[0]?.value ?? '',
+				default: defaultResource,
 				description:
 					'Area da API Digisac agrupada pela documentacao Postman. Resources Popular sao atalhos para operacoes frequentes; resources General contem o catalogo mais completo. Se a mesma chamada existir em Popular e General, prefira Popular para fluxos comuns e General quando precisar de uma chamada que nao existe no Popular.',
 			},

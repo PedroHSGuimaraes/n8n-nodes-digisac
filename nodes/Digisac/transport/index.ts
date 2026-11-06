@@ -45,7 +45,7 @@ export async function digisacApiRequest(
 	body: IDataObject | IDataObject[] = {},
 	qs: IDataObject = {},
 	config: DigisacRequestConfig = {},
-): Promise<any> {
+): Promise<unknown> {
 	const responseFormat = config.responseFormat ?? 'json';
 	const options: IHttpRequestOptions = {
 		method,
