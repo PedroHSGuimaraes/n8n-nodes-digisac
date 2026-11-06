@@ -113,7 +113,9 @@ describe('IDs guiados na versão 2', () => {
 
 	it('S3.03 os 24 tipos restantes de path viram resourceLocator só com id', () => {
 		const tipos = new Set(DIGISAC_ENDPOINTS.flatMap((e) => e.pathParams));
-		const restantes = [...tipos].filter((t) => !(t in TIPOS_COM_LISTA));
+		// Quadro, coluna e card do Kanban têm lista própria (ver kanban-seletores.test.cjs).
+		const tiposKanban = new Set(['boardId', 'columnId', 'cardId']);
+		const restantes = [...tipos].filter((t) => !(t in TIPOS_COM_LISTA) && !tiposKanban.has(t));
 		assert.equal(restantes.length, 24);
 		for (const tipo of restantes) {
 			for (const operacao of DIGISAC_ENDPOINTS.filter((e) => e.pathParams.includes(tipo))) {

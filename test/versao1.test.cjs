@@ -55,8 +55,17 @@ describe('versão 1 do node', () => {
 	it('S2.03 v1 mantém name e type de todo parâmetro da 1.0.3', () => {
 		const propriedades = new Digisac().description.properties;
 		// Chave de comparação: name + type + onde o campo aparece (sem a condição @version, nova na v2).
+		// As operações do Kanban (e299 a e315) são novas e entram na lista `operation` dos campos globais
+		// (como `useRawBodyJson`). Elas saem da comparação: o que a 1.1.0 garante é que nenhuma
+		// operação antiga perdeu ou trocou parâmetro, e a lista das antigas continua igual.
+		const operacoesNovas = new Set(
+			Array.from({ length: 17 }, (_, i) => `e${String(299 + i)}`),
+		);
 		const chave = (p, show) => {
 			const { '@version': _ignorado, ...resto } = show ?? {};
+			if (Array.isArray(resto.operation)) {
+				resto.operation = resto.operation.filter((id) => !operacoesNovas.has(id));
+			}
 			return `${p.name}|${p.type}|${JSON.stringify(resto)}`;
 		};
 		// Só entram as propriedades visíveis na versão 1: sem condição de versão ou com a 1 nela.
