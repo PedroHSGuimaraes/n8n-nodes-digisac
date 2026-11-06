@@ -108,7 +108,7 @@ Em node novo, os 8 IDs principais são Resource Locator com lista pesquisável e
 **Acceptance Criteria**
 
 1. WHEN alguém adiciona o node a um workflow novo THEN o sistema SHALL criá-lo com `typeVersion` 2
-2. The node SHALL expor, para `@version` 2, como `resourceLocator` com modos `list` (padrão, `searchable: true`) e `id`, todo parâmetro de path de `contactId`, `serviceId`, `departmentId`, `userId`, `tagId`, `roleId`, `botId` e `ticketTopicId`, e os campos `serviceId`, `departmentId` e `userId` de query, e as chaves `contactId`, `userId`, `serviceId` e `departmentId` dos Campos do Body, nas operações onde cada um existe
+2. The node SHALL expor, para `@version` 2, como `resourceLocator` com modos `list` (padrão, `searchable: true`) e `id`, todo parâmetro de path de `contactId`, `serviceId`, `departmentId`, `userId`, `tagId`, `roleId`, `botId` e `ticketTopicId`, e os campos `contactId`, `serviceId`, `departmentId` e `userId` de query (os valores de placeholder das queries JSON complexas continuam texto), e as chaves `contactId`, `userId`, `serviceId` e `departmentId` dos Campos do Body, nas operações onde cada um existe
 3. The node SHALL expor, para `@version` 2, como `resourceLocator` só com o modo `id`, os 24 tipos de ID de path restantes (por exemplo `ticketId`, `messageId`, `cardsId`, `campaignsId`)
 4. WHEN o `execute` roda com `typeVersion` 2, `operation` `e001`, `path_e001_contactId` `{ mode: 'list', value: 'c1' }` e `path_e001_botId` `{ mode: 'id', value: ' b1 ' }` THEN o sistema SHALL chamar `POST` em `/api/v1/bots/b1/trigger-signal/c1` (espaço nas pontas removido)
 5. IF o Resource Locator de path chega com `value` vazio THEN o sistema SHALL lançar `NodeOperationError` com a mensagem `The 'Contact Id' parameter is empty [item 0]` e a descrição `Choose a contact from the list or paste its ID`
@@ -157,6 +157,7 @@ A versão nova chega ao npm com provenance, pelo stage com aprovação do dono, 
 | Datas dos filtros `filters[createdAt]` e `filters[endedAt]` de ausências | O modelo da documentação traz um placeholder com sufixo `Z` colado, que não tem formato confirmado |
 | Parâmetro de simplificar a saída | O pedido é sobre o preenchimento dos campos, não sobre a saída |
 | Novas operações ou recursos | O pedido não pediu; o catálogo vem da coleção Postman |
+| Valores de placeholder das queries JSON complexas (`query_e045_contactId` e parentes) | São texto que substitui `{{...}}` dentro de JSON; guiar exigiria reescrever a query |
 | Tradução ou revisão dos rótulos em português e inglês misturados | Fora do pedido; o lint novo só exige Title Case onde acusa |
 | A pasta local `pedro/` e sua subpasta `docs/` | São diretórios vazios sem arquivo versionado pelo git; nada a mudar e nada a apagar |
 

@@ -8,6 +8,8 @@ import type {
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { executeEndpoint, resourceOptions, resourceProperties } from './actions';
+import { withGuidedIds } from './helpers/resourceLocator';
+import { listSearch } from './methods/listSearch';
 
 // Valor padrão do campo Resource: a primeira pasta do catálogo. Fica numa constante
 // para o lint enxergar um `default` simples (a regra não avalia expressão com `??`).
@@ -19,7 +21,9 @@ export class Digisac implements INodeType {
 		name: 'digisac',
 		icon: { light: 'file:digisac.png', dark: 'file:digisac.dark.png' },
 		group: ['transform'],
-		version: 1,
+		// A versão 2 troca os campos de ID por Resource Locator; a 1 fica igual para workflows salvos (AD-002).
+		version: [1, 2],
+		defaultVersion: 2,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description:
 			'Use every documented Digisac API request from the public Postman documentation. Choose a resource folder and operation, fill required path parameters and use the generated query/body fields first. Advanced JSON fields are available only when an operation needs a custom payload or unsupported filter. Built for AI Agents: operation descriptions include method, path, source folder, required path variables, query guidance, body fields and explicit reminders to use IDs returned by Digisac instead of inventing values.',
@@ -51,9 +55,12 @@ export class Digisac implements INodeType {
 				description:
 					'Area da API Digisac agrupada pela documentacao Postman. Resources Popular sao atalhos para operacoes frequentes; resources General contem o catalogo mais completo. Se a mesma chamada existir em Popular e General, prefira Popular para fluxos comuns e General quando precisar de uma chamada que nao existe no Popular.',
 			},
-			...resourceProperties,
+			...withGuidedIds(resourceProperties),
 		],
 	};
+
+	// Listas pesquisáveis dos Resource Locators da versão 2.
+	methods = { listSearch };
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();

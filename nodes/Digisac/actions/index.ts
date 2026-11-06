@@ -23,6 +23,7 @@ import {
 	templateVariables,
 	toTitle,
 } from '../helpers/format';
+import { getIdParameter, plainValue } from '../helpers/resourceLocator';
 import { digisacApiRequest, type DigisacResponseFormat } from '../transport';
 
 type QueryEntry = {
@@ -783,7 +784,8 @@ function collectPathValues(
 	const values: Record<string, string> = {};
 	for (const parameter of endpoint.pathParams) {
 		const name = fieldName('path', endpoint.id, parameter);
-		const value = node.getNodeParameter(name, i, '') as string;
+		// Leitura única: texto na versão 1, Resource Locator na versão 2 (vazio lança erro claro).
+		const value = getIdParameter(node, name, parameter, i);
 		if (value !== '') {
 			values[parameter] = value;
 		}
@@ -815,7 +817,8 @@ function buildSimpleQueryValue(
 	i: number,
 	entry: QueryEntry,
 ): string | undefined {
-	const configuredValue = node.getNodeParameter(entry.field, i, queryDefault(entry)) as string;
+	// O campo pode ser texto (versão 1) ou Resource Locator (versão 2); plainValue entrega sempre texto.
+	const configuredValue = plainValue(node.getNodeParameter(entry.field, i, queryDefault(entry)));
 	if (configuredValue === '') return undefined;
 
 	if (entry.variables.length === 1) {
@@ -913,7 +916,12 @@ function buildBodyFromFields(
 	const body: Record<string, unknown> = {};
 
 	for (const field of fields) {
-		const value = values[field.key];
+		// ID de body pode vir como Resource Locator na versão 2; os demais valores passam como estão.
+		const raw = values[field.key];
+		// Só desembrulha texto no formato {mode, value}; campos JSON com objeto de verdade passam intactos.
+		const isLocator =
+			field.type === 'string' && typeof raw === 'object' && raw !== null && 'mode' in raw && 'value' in raw;
+		const value = isLocator ? plainValue(raw) : raw;
 		if (!shouldUseBodyValue(value, field.type)) continue;
 
 		const normalized = normalizeBodyFieldValue(node, value, field);

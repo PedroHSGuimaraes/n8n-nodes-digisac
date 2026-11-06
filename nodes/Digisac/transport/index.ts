@@ -3,6 +3,7 @@ import type {
 	IExecuteFunctions,
 	IHttpRequestMethods,
 	IHttpRequestOptions,
+	ILoadOptionsFunctions,
 	JsonObject,
 } from 'n8n-workflow';
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
@@ -21,8 +22,11 @@ export interface DigisacRequestConfig {
 	responseFormat?: DigisacResponseFormat;
 }
 
+// O `execute` e o `listSearch` chamam o mesmo transporte; os dois contextos têm credencial e helpers.
+type DigisacContext = IExecuteFunctions | ILoadOptionsFunctions;
+
 async function getBaseUrl(
-	this: IExecuteFunctions,
+	this: DigisacContext,
 	baseVariable: 'URL' | 'URLbase' | '' = 'URL',
 ): Promise<string> {
 	const credentials = await this.getCredentials('digisacApi');
@@ -43,7 +47,7 @@ async function getBaseUrl(
 }
 
 export async function digisacApiRequest(
-	this: IExecuteFunctions,
+	this: DigisacContext,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject | IDataObject[] = {},
