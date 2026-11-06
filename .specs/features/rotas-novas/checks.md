@@ -25,10 +25,10 @@ Proof: run unit | ✔ K1.03 reuseIds
 Proof: run unit | ✔ K1.04 as 17 rotas
 
 **C5** - `normalizePath` troca `/v1/kanban-*` por `/api/v1/kanban-*` e deixa `/v1/cards` como está (S1 AC 3)
-Proof: run unit | ✔ K1.05 prefixo dos PUT
+Proof: run unit | ✔ K1.05 o gerador põe /api nos PUT
 
 **C6** - O `build` do `package.json` não chama o gerador (S1 AC 4)
-Proof: run unit | ✔ K1.06 build sem gerador
+Proof: run unit | ✔ K1.06 o build não chama o gerador
 
 ### S2 - as 17 operações enviam a requisição certa
 
@@ -83,10 +83,10 @@ Proof: run unit | ✔ K2.16 erros do Digisac
 ### S3 - apagar só com confirmação
 
 **C23** - As três operações de apagar expõem `Confirm Delete` booleano, padrão `false`, e a descrição da operação começa com `Warning:` (S3 AC 1)
-Proof: run unit | ✔ K3.01 campo de confirmação
+Proof: run unit | ✔ K3.01 as três operações de apagar têm o campo Confirm Delete
 
 **C24** - Sem confirmação (desligada ou ausente), cada uma das três lança a mensagem certa e grava zero requisições (S3 AC 2)
-Proof: run unit | ✔ K3.02 recusa sem confirmação
+Proof: run unit | ✔ K3.02 sem confirmação cada uma das três recusa
 
 **C25** - Excluir quadro com confirmação envia `DELETE /api/v1/kanban-boards/b1` (S3 AC 3)
 Proof: run unit | ✔ K3.03 excluir quadro
@@ -103,7 +103,7 @@ Proof: run unit | ✔ K3.06 outras DELETE
 ### S4 - quadro, coluna e card como lista pesquisável
 
 **C29** - Na versão 2, os 3 IDs de path, as 7 chaves de body e os 2 placeholders de query viram `resourceLocator` com `list` e `id` (S4 AC 1)
-Proof: run unit | ✔ K4.01 locators do Kanban
+Proof: run unit | ✔ K4.01 quadro, coluna e card viram resourceLocator
 
 **C30** - A lista de quadros chama `GET /api/v1/kanban-boards`, filtra o texto sem acento e lê array puro e `{ data }` (S4 AC 2)
 Proof: run unit | ✔ K4.02 lista de quadros
@@ -121,12 +121,12 @@ Proof: run unit | ✔ K4.05 campos auxiliares
 Proof: run unit | ✔ K4.06 401 nas listas
 
 **C35** - Na versão 2, `list` e `id` com espaço chegam como `b1` em quadro, coluna e card (S4 AC 7)
-Proof: run unit | ✔ K4.07 v2 lê list e id
+Proof: run unit | ✔ K4.07 a versão 2 lê list e id
 
 ### S5 - versões, compatibilidade e documentação
 
 **C36** - Na versão 1, todo parâmetro das 298 operações antigas mantém `name` e `type`, e as 17 novas aparecem com texto (S5 AC 1)
-Proof: run unit | ✔ K5.01 versão 1 intacta
+Proof: run unit | ✔ K5.01 a versão 1 vê as operações novas
 
 **C37** - O `package.json` está em `1.2.0` e o `CHANGELOG.md` tem a seção `## 1.2.0` (S5 AC 2)
 Proof: run unit | ✔ K5.02 versão e changelog
@@ -135,7 +135,7 @@ Proof: run unit | ✔ K5.02 versão e changelog
 Proof: run unit | ✔ K5.03 README do Kanban
 
 **C39** - `npm run generate:docs` grava 315 chamadas em `docs/api-calls.md` e preserva o resto do README (S5 AC 4)
-Proof: run unit | ✔ K5.04 docs com 315
+Proof: run unit | ✔ K5.04 a documentação gerada lista 315 chamadas
 
 **C40** - Lint, tsc, build e a suíte saem com código 0 (S5 AC 5)
 Proof: run unit | ℹ fail 0
