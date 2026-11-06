@@ -122,7 +122,7 @@ Cada operação do Kanban chama o método e o caminho da documentação, com os 
 13. WHEN `Editar card` roda com `cardId` `k1`, `columnId` `c2` e `position` `3` THEN o sistema SHALL enviar `PUT /api/v1/kanban-cards/k1` com body `{ columnId: 'c2', position: 3 }`
     - `position` não adicionado → o body não leva `position`
 14. WHEN `Reordenar card` roda com `cardId` `k1`, `beforeCardId` `k0`, `columnId` `c2` e `moveTo` `top` THEN o sistema SHALL enviar `PATCH /api/v1/kanban-cards/k1/reorder` com body `{ beforeCardId: 'k0', columnId: 'c2', moveTo: 'top' }`
-15. IF o campo de ID de path chega vazio THEN o sistema SHALL lançar `NodeOperationError` com a mensagem `The 'Board Id' parameter is empty [item 0]` (ou `Column Id`, `Card Id`) e a descrição `Paste the ID for Board Id`
+15. IF o campo de ID de path chega vazio THEN o sistema SHALL lançar `NodeOperationError` com a mensagem `The 'Board Id' parameter is empty [item 0]` (ou `Column Id`, `Card Id`) e a descrição `Choose a board from the list or paste its ID` (`column`, `card`)
     - `boardId` vazio na versão 2 → mensagem do quadro; `cardId` vazio → mensagem do card
 
 ### S3: apagar só com confirmação (P1)
@@ -131,7 +131,7 @@ As três operações de apagar do Kanban não enviam nada ao Digisac sem a confi
 
 **Acceptance Criteria**
 
-1. The node SHALL expor, em `Excluir quadro`, `Excluir coluna` e `Excluir card`, o campo booleano `Confirm Delete` com padrão `false` e descrição que começa com `Warning:`
+1. The node SHALL expor, em `Excluir quadro`, `Excluir coluna` e `Excluir card`, o campo booleano `Confirm Delete` com padrão `false`, e a descrição de cada uma das três operações SHALL começar com `Warning:` (o lint do n8n exige que a descrição do booleano comece com `Whether`, então o aviso fica na operação, como no RD Conversas)
 2. IF `Confirm Delete` está desligado THEN o sistema SHALL lançar `NodeOperationError` com a mensagem `Turn on 'Confirm Delete' to delete this kanban board` (e `column`, `card`) antes de qualquer requisição HTTP
    - `Confirm Delete` ausente (valor padrão) → recusa e zero requisições gravadas
 3. WHEN `Confirm Delete` está ligado e `Excluir quadro` roda com `boardId` `b1` THEN o sistema SHALL enviar `DELETE /api/v1/kanban-boards/b1`

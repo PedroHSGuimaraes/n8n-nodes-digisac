@@ -15,7 +15,9 @@ const pacote = JSON.parse(ler('package.json'));
 
 describe('documentação e lançamento', () => {
 	it('S5.01 versão 1.1.0, funding do dono e seção no CHANGELOG', () => {
-		assert.equal(pacote.version, '1.1.0');
+		// A versão do pacote sobe a cada lançamento (a 1.2.0 é provada em kanban-docs.test.cjs);
+		// aqui basta ser da linha 1.x, e a seção 1.1.0 do CHANGELOG precisa continuar lá.
+		assert.match(pacote.version, /^1\.\d+\.\d+$/);
 		assert.deepEqual(pacote.funding, {
 			type: 'individual',
 			url: 'https://buymeacoffee.com/qTny0AzFXS',

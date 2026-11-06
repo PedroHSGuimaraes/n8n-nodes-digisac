@@ -15,7 +15,8 @@ Um único node cobre **todas as chamadas da coleção Postman pública do Digisa
 ## 🚀 Funcionalidades
 
 - **1 node unificado** — `Digisac` com seletor **Resource → Operation**. Cada operation é uma chamada real da API, com método, caminho e origem na documentação.
-- **Cobertura completa** — 298 chamadas em 51 recursos, geradas da coleção pública Postman.
+- **Cobertura completa** — 315 chamadas em 52 recursos, geradas da coleção pública Postman, incluindo o **Kanban** (quadros, colunas e cards).
+- **Kanban com lista pesquisável** — na versão 2, quadro e coluna aparecem como lista da sua conta, e o card aparece depois de você escolher a coluna. Excluir quadro, coluna ou card só roda com **Confirm Delete** ligado.
 - **IDs em lista pesquisável (versão 2 do node)** — contato, conexão, departamento, usuário, tag, cargo, robô e assunto de chamado aparecem como lista da sua conta, com busca, e aceitam colar o ID. Os outros IDs aceitam colar o ID no mesmo formato.
 - **Datas e opções guiadas (versão 2 do node)** — período, `From` e `To` têm seletor de data; `Status`, `Period Type`, `Type`, participações e `Origin` são listas de opções.
 - **Workflows salvos não mudam** — quem já usa a versão 1 continua enviando a mesma requisição.
@@ -76,12 +77,27 @@ Regra para automações e Tools de IA: todo campo terminado em `Id` ou `Ids` dev
 | **Body Fields** | Coleção gerada do body documentado para operações de escrita. |
 | **Options → Response Format** | `Text` para respostas que não são JSON. |
 
+### Kanban (quadros, colunas e cards)
+
+O resource **Kanban (General)** tem 17 operações, três por tipo mais as de ordem:
+
+| Tipo | Operações |
+| --- | --- |
+| Quadro | **Listar quadros**, **Buscar quadro**, **Criar quadro**, **Editar quadro**, **Excluir quadro** |
+| Coluna | **Listar colunas**, **Buscar coluna**, **Criar coluna**, **Editar coluna**, **Excluir coluna**, **Reordenar coluna** |
+| Card | **Listar cards**, **Buscar card**, **Criar card**, **Editar card**, **Excluir card**, **Reordenar card** |
+
+- **Escolha em cascata (versão 2).** Em operações que pedem uma coluna, o campo **Filter by Board** estreita a lista de colunas a um quadro. Em operações que pedem um card, o campo **Filter by Column** mostra os cards daquela coluna. Esses dois campos só ajudam a escolher: o node não os envia ao Digisac. Sem a coluna escolhida, a lista de cards fica vazia; cole o ID no modo **By ID** se já o tem.
+- **Excluir exige confirmação.** **Excluir quadro**, **Excluir coluna** e **Excluir card** têm o campo **Confirm Delete**, desligado por padrão. Sem ele ligado, o node para antes de chamar a API.
+- **Body Fields começa vazio.** Em criar e editar, adicione só os campos que quer enviar. Assim, editar um card não sobrescreve a posição, e editar um quadro não troca os departamentos.
+- **Versão 1.** Quem usa a versão 1 vê as mesmas 17 operações com campos de texto, sem a lista pesquisável.
+
 ### Todas as chamadas da API
 
 O catálogo completo fica em [docs/api-calls.md](docs/api-calls.md). Resumo por método:
 
 ```text
-GET: 144 | POST: 93 | PUT: 34 | PATCH: 1 | DELETE: 26
+GET: 150 | POST: 96 | PUT: 37 | PATCH: 3 | DELETE: 29
 ```
 
 Resumo por recurso (gerado por `npm run generate:docs`):
@@ -121,6 +137,7 @@ Resumo por recurso (gerado por `npm run generate:docs`):
 | Historico de chamados (Popular) | 9 |
 | Idioma da plataforma (General) | 1 |
 | Integracoes (General) | 2 |
+| Kanban (General) | 17 |
 | Mensagens (General) | 13 |
 | Mensagens (Popular) | 8 |
 | Mensagens interativas (General) | 7 |
@@ -240,6 +257,23 @@ Preencha os campos de query:
 - `Period Type`: `open` ou `close`
 - `Status`: `all`, `open` ou `close`
 
+### Mover card entre colunas
+
+Resource: **Kanban (General)**  
+Operation: **Editar card**
+
+Escolha o card (versão 2: use **Filter by Column** para achar o card na lista, ou cole o ID no modo **By ID**). Em **Body Fields**, adicione:
+
+- `Column Id`: a coluna de destino, escolhida na lista.
+- `Position`: opcional, o número da posição na coluna.
+
+### Excluir card com confirmação
+
+Resource: **Kanban (General)**  
+Operation: **Excluir card**
+
+Escolha o card e ligue **Confirm Delete**. Sem isso o node recusa a chamada com a mensagem `Turn on 'Confirm Delete' to delete this kanban card`.
+
 ### Criar webhook
 
 Resource: **Webhooks (General)**  
@@ -341,6 +375,7 @@ Antes de criar, editar, excluir, arquivar, bloquear, fechar chamado ou enviar me
 - Nunca deixe o modelo inventar IDs.
 - Use credenciais dedicadas por ambiente/cliente.
 - Para operações destrutivas (`DELETE`, arquivar, bloquear, fechar chamado), coloque etapa humana de confirmação quando o fluxo for sensível.
+- **Kanban como tool.** As 17 operações do Kanban funcionam como tool. Para **Excluir quadro**, **Excluir coluna** e **Excluir card**, deixe **Confirm Delete** desligado na tool e ligue só num fluxo que você revisou: o agente não consegue apagar sem esse campo. O agente deve achar o quadro com **Listar quadros**, a coluna com **Listar colunas** e o card com **Listar cards** antes de mover ou excluir.
 - Em mensagens enviadas ao cliente, gere o texto em etapa anterior e passe o texto final para a tool.
 - Use campos dedicados sempre que existirem. Para bodies grandes ou arrays de múltiplos itens, use JSON explícito e valide campos obrigatórios no workflow antes da chamada.
 
@@ -354,7 +389,7 @@ Antes de criar, editar, excluir, arquivar, bloquear, fechar chamado ou enviar me
 
 | | **Versão 1** | **Versão 2 (padrão em node novo)** |
 | --- | --- | --- |
-| IDs | Texto digitado | Lista pesquisável (8 tipos) ou **By ID** (os demais) |
+| IDs | Texto digitado | Lista pesquisável (8 tipos, mais quadro, coluna e card do Kanban) ou **By ID** (os demais) |
 | Datas | Texto | Seletor de data, enviada em ISO UTC |
 | Valores fixos | Texto | Lista de opções |
 | Workflows salvos | Continuam iguais | Não são alterados |
@@ -418,6 +453,7 @@ A tag `vX.Y.Z` dispara o workflow `publish.yml`, que envia a versão com `npm st
 
 ## 📈 Versões
 
+- **1.2.0** — **Kanban.** 17 operações novas de quadros, colunas e cards, com lista pesquisável na versão 2 e **Confirm Delete** nas três de excluir. O catálogo passa a guardar o ID de cada operação: nenhum workflow salvo muda de operação. Veja o `CHANGELOG.md`.
 - **1.1.0** — **IDs, datas e valores guiados.** Em node novo (versão 2 do node), contato, conexão, departamento, usuário, tag, cargo, robô e assunto aparecem em lista pesquisável; datas têm seletor; valores fixos viram opções. Workflows salvos continuam na versão 1. Migração para o `@n8n/node-cli` 0.55.5, lint oficial sem erros, testes, CI e timeout de 30 s. Veja o `CHANGELOG.md`.
 - **1.0.3** — Descrições de AI Tool reforçadas: regra para campos `Id/Ids`, alertas para placeholders, orientação Popular vs General e avisos por tipo de campo.
 - **1.0.2** — Interface simplificada: query e body com campos dedicados gerados da documentação. JSON fica em opções avançadas.

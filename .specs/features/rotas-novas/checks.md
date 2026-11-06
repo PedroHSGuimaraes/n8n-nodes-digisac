@@ -82,7 +82,7 @@ Proof: run unit | ✔ K2.16 erros do Digisac
 
 ### S3 - apagar só com confirmação
 
-**C23** - As três operações de apagar expõem `Confirm Delete` booleano, padrão `false`, descrição com `Warning:` (S3 AC 1)
+**C23** - As três operações de apagar expõem `Confirm Delete` booleano, padrão `false`, e a descrição da operação começa com `Warning:` (S3 AC 1)
 Proof: run unit | ✔ K3.01 campo de confirmação
 
 **C24** - Sem confirmação (desligada ou ausente), cada uma das três lança a mensagem certa e grava zero requisições (S3 AC 2)
