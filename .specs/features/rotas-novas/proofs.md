@@ -1,9 +1,9 @@
 # rotas-novas proofs
 
-**HEAD**: 49a4e17
+**HEAD**: f466213
 **Tree**: clean
 **Shell**: /bin/sh
-**Result**: 43 pass, 0 fail
+**Result**: 44 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -43,6 +43,7 @@
 | C34 | `run unit / ✔ K4.06 401 nas listas` | pass |
 | C35 | `run unit / ✔ K4.07 a versão 2 lê list e id` | pass |
 | C36 | `run unit / ✔ K5.01 a versão 1 vê as operações novas` | pass |
+| C36 | `run unit / ✔ S2.03 v1 mantém name e type` | pass |
 | C37 | `run unit / ✔ K5.02 versão e changelog` | pass |
 | C38 | `run unit / ✔ K5.03 README do Kanban` | pass |
 | C39 | `run unit / ✔ K5.04 a documentação gerada lista 315 chamadas` | pass |
@@ -56,19 +57,19 @@
 `Run unit` - exit 0
 
 ```
-  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (1.404397ms)
-  ✔ S2.02 v1 vazio lança erro de parâmetro de path (1.848335ms)
-  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (2.522433ms)
-  ✔ S2.04 formato texto devolve data com o texto (1.616469ms)
-  ✔ S2.05 v1 envia número e booleano de campo de query como texto (4.015658ms)
-  ✔ S2.06 v1 aceita booleano em ID de path como a 1.0.3 (2.298526ms)
-✔ versão 1 do node (18.215999ms)
-ℹ tests 85
+  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (1.798173ms)
+  ✔ S2.02 v1 vazio lança erro de parâmetro de path (2.129085ms)
+  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (3.112569ms)
+  ✔ S2.04 formato texto devolve data com o texto (1.388915ms)
+  ✔ S2.05 v1 envia número e booleano de campo de query como texto (4.044373ms)
+  ✔ S2.06 v1 aceita booleano em ID de path como a 1.0.3 (2.246317ms)
+✔ versão 1 do node (20.033891ms)
+ℹ tests 87
 ℹ suites 13
-ℹ pass 85
+ℹ pass 87
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 803.707449
+ℹ duration_ms 848.374444
 ```
