@@ -1,8 +1,8 @@
 # node-cli-campos-v2 verification
 
-**Verdict**: FAIL
-**Proofs**: `proofs.md` at e1aae30 (branch HEAD 8b95a7b; diff range `origin/main..HEAD`)
-**Verifier**: independent sub-agent (author != verifier)
+**Verdict**: PASS
+**Proofs**: `proofs.md` at dfed990 (diff range `origin/main..HEAD`)
+**Verifier**: independent sub-agent (author != verifier); rodada 2 e as linhas C39 a C47 pelo revisor the-judge (julgado por revisor independente, não pelo autor)
 
 ## Checks
 
@@ -46,12 +46,15 @@
 | C36 | `publicacao.test.cjs` `S5.03 generate:docs troca só o bloco entre marcadores` | no - it tests `substituirBloco`, not the `generate-docs.mjs` script that the claim names (see F9) |
 | C37 | `publicacao.test.cjs` `S5.04 publish.yml usa o stage do npm 12.2.2 com provenance` | yes - `RELEASE_MODE` and `workflow_dispatch` are matched anywhere in the file, not on the stage step |
 | C38 | `publicacao.test.cjs` `S5.06 o pacote mantém o nome n8n-nodes-digisac` | yes |
-| C39 | `seletores.test.cjs` `S3.12 busca de contato limpa o + e escapa % e _` | yes - asserta o valor exato de `qs` para telefone com +, texto misto e curinga (check anexado após o Verifier, do achado F1/F2; sem segundo Verifier) |
-| C40 | `seletores.test.cjs` `S3.13 página cheia sem acerto no filtro do node ainda devolve token` | yes - asserta `results` vazio e token `2` (achado F10) |
-| C41 | `seletores.test.cjs` `S3.14 ID de path em texto na v2 perde o espaço e número vale` | yes - asserta a URL final para `' c1 '` e `123` (achado F5) |
-| C42 | `seletores.test.cjs` `S3.15 cópias da v2 ficam invisíveis na v1` | yes - conta uma cópia por versão em cada grupo nome+onde e exige mais de 250 grupos (achado F11) |
-| C43 | `datas-opcoes.test.cjs` `S4.08 datas estritas: lixo e dia inexistente falham, Date e sem fuso valem` | yes - asserta o erro para 4 valores ruins e o ISO exato para 4 formas válidas (achado F4) |
-| C44 | `datas-opcoes.test.cjs` `S4.09 periodType open sai como openDate onde a documentação cola Date` | yes - asserta `qs.periodType` igual a `openDate` em e109 (achado F8) |
+| C39 | `seletores.test.cjs` `S3.12 busca de contato limpa o + e escapa % e _` | yes - asserta o valor exato de `qs` para telefone com `+`, texto misto e curinga; falharia se o `+` ficasse ou o `%` e o `_` não fossem escapados. Fica de fora o escape do `\` (julgado por revisor independente, não pelo autor) |
+| C40 | `seletores.test.cjs` `S3.13 página cheia sem acerto no filtro do node ainda devolve token` | yes - asserta `results` vazio e token `2` com 50 itens e texto sem acerto; falharia se o token dependesse do filtro (julgado por revisor independente, não pelo autor) |
+| C41 | `seletores.test.cjs` `S3.14 ID de path em texto na v2 perde o espaço e número vale` | yes - asserta a URL final para `' c1 '` e para `123` na v2; o booleano é coberto na v1 por C46 e usa o mesmo `getIdParameter` (julgado por revisor independente, não pelo autor) |
+| C42 | `seletores.test.cjs` `S3.15 cópias da v2 ficam invisíveis na v1` | yes - conta uma cópia por versão em cada grupo nome+onde e exige mais de 250 grupos; falharia sem `@version` na cópia v2 (julgado por revisor independente, não pelo autor) |
+| C43 | `datas-opcoes.test.cjs` `S4.08 datas estritas: lixo e dia inexistente falham, Date e sem fuso valem` | yes - 4 valores ruins falham com a mensagem, 4 formas válidas saem em ISO exato; não cobre fuso no formato `-0300` (julgado por revisor independente, não pelo autor) |
+| C44 | `datas-opcoes.test.cjs` `S4.09 periodType open sai como openDate onde a documentação cola Date` | yes - asserta `openDate` em e109; a operação e281, que a documentação também cola `Date`, fica sem teste próprio (julgado por revisor independente, não pelo autor) |
+| C45 | `versao1.test.cjs` `S2.05 v1 envia número e booleano de campo de query como texto` | yes - 4 valores (`5`, `0`, `true`, `false`) com `qs` exato; ficou vermelho antes da correção (`qs` indefinido) e verde depois (julgado por revisor independente, não pelo autor) |
+| C46 | `versao1.test.cjs` `S2.06 v1 aceita booleano em ID de path como a 1.0.3` | yes - asserta a rota `/bots/true/...`; ficou vermelho antes da correção (julgado por revisor independente, não pelo autor) |
+| C47 | `publicacao.test.cjs` `S5.07 README ensina a usar o node como Tool de IA, com campos reais` | yes - 12 trechos dentro da seção, e `messageText` proibido; ficou vermelho com o README anterior. Confere a presença do texto, não a clareza dele (julgado por revisor independente, não pelo autor) |
 
 ## Findings
 
@@ -70,3 +73,7 @@ Own examples, run at HEAD over `dist` as throwaway tests (not committed): contac
 | F9: S5.03 imports the helper only. A change to `generate-docs.mjs` that rewrites the whole README keeps S5.03 green. | `publicacao.test.cjs` S5.03; `scripts/generate-docs.mjs` lines 115-118 | run the script against a temporary README copy and compare the text outside the markers | a3e9cd2 - C36 (S5.03b roda o script de verdade) |
 | F10: for the 7 node-side lists, the text filters only the page already fetched (50 items). With more than 50 users or tags, an item on page 2 is not found by typing its name; with a full page and no match, the result is empty but carries a token. S3.08 only tests a 2-item page. | `listSearch.ts` `pagedSearch`; probe B: 50 items and text `zzz` gave `{"results":[],"paginationToken":"2"}` | record the limit in the plan (or search the API with `where[name][$iLike]` for these routes once confirmed) and add a test for the full page with no match | a3e9cd2 - C40 (S3.13); limite aceito e registrado em Assumptions do plano |
 | F11: C13 reads presence only; no test asserts that a v2 copy is invisible on v1 for the body ID, the query ID and the date, so a missing `@version` on the v2 copy would show two fields on v1. | `versao1.test.cjs` S2.03; `seletores.test.cjs` S3.02b has no v1 side | add a check that every `resourceLocator`, `dateTime` and v2 `options` copy has `@version` limited to `>= 2` | a3e9cd2 - C42 (S3.15) |
+| F12: a versão 1 descartava número e booleano de campo de query (`serviceId` 5 saía sem filtro) e booleano de ID de path; a 1.0.3 enviava o valor como texto. Revisão the-judge, rodada 1 (F1). | `origin/main` com `queryKey_e101_serviceId` 5 enviou `serviceId=5`; o PR não enviou filtro; 0 e `true` também | `plainValue` converte número e booleano em texto e `getIdParameter` reaproveita a leitura | 924a4a6 - C45 (S2.05) e C46 (S2.06) |
+| F13: a seção de Tool de IA do README não tinha o passo a passo, a assinatura do `$fromAI` nem exemplos com campos reais (`messageText` não existe no node). Revisão the-judge (F2). | `README.md` seção "Usar como Tool de Agente de IA" antes do commit dfed990 | passo a passo, assinatura, exemplos com `Text`, `Contact Id`, `Start Period` e referências | dfed990 - C47 (S5.07) |
+| F14: o comentário do `perPage` 50 em `listSearch.ts` não batia com a coleção (35 e 40 no GET simples, 50 só no `query` JSON). Revisão the-judge (F3). | coleção Postman oficial, consultada em 06/11/2026 | comentário corrigido; a suposição segue em Assumptions do plano | dfed990 |
+| F15: o comentário do `workflow_dispatch` não dizia que o disparo precisa partir da tag. Revisão the-judge (F5). | `publish.yml` passo `Validate release tag` | comentário acrescentado | dfed990 |
