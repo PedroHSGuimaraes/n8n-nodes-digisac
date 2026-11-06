@@ -82,4 +82,30 @@ describe('versão 1 do node', () => {
 		);
 		assert.deepEqual(saida[0][0].json, { data: 'texto puro' });
 	});
+
+	// Regra protegida (achado F1 do revisor): na 1.0.3 um número ou booleano que chega por expressão
+	// (`{{ $json.page }}`) num campo de texto saía na query como texto ("5", "0", "true"). Se a v1 voltar a
+	// ler esse valor como vazio, o filtro some em silêncio e o workflow salvo busca sem filtro.
+	it('S2.05 v1 envia número e booleano de campo de query como texto', async () => {
+		const consulta = { operation: 'e101', options: {} };
+		for (const [valor, esperado] of [
+			[5, '5'],
+			[0, '0'],
+			[true, 'true'],
+			[false, 'false'],
+		]) {
+			const { contexto } = await executar(1, { ...consulta, queryKey_e101_serviceId: valor });
+			assert.deepEqual(
+				contexto.requisicoes[0].qs,
+				{ serviceId: esperado },
+				`v1 deixou de enviar ${String(valor)}`,
+			);
+		}
+	});
+
+	it('S2.06 v1 aceita booleano em ID de path como a 1.0.3', async () => {
+		const { contexto } = await executar(1, { ...baseE001, path_e001_botId: true });
+		// A 1.0.3 codificava o valor como texto: `true` entrava na rota.
+		assert.equal(contexto.requisicoes[0].url, '/api/v1/bots/true/trigger-signal/c1');
+	});
 });

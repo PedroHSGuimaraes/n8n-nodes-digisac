@@ -188,6 +188,9 @@ export function plainValue(raw: unknown): string {
 	if (typeof raw === 'object' && raw !== null) {
 		return String((raw as { value?: unknown }).value ?? '').trim();
 	}
+	// Número e booleano vindos de expressão (`{{ $json.page }}`) valem como texto, igual à 1.0.3.
+	// Sem isto, o filtro de um workflow salvo na versão 1 sumia da requisição em silêncio.
+	if (typeof raw === 'number' || typeof raw === 'boolean') return String(raw);
 	return typeof raw === 'string' ? raw : '';
 }
 
@@ -205,11 +208,10 @@ export function getIdParameter(
 ): string {
 	const raw = node.getNodeParameter(name, itemIndex, '') as unknown;
 	if (typeof raw !== 'object' || raw === null) {
-		// Número (ex.: vindo de expressão) vale como ID, igual à 1.0.3, que o convertia em texto.
-		if (typeof raw === 'number') return String(raw);
-		if (typeof raw !== 'string') return '';
+		// Número e booleano (ex.: vindos de expressão) valem como ID, igual à 1.0.3, que os convertia em texto.
+		const text = plainValue(raw);
 		// Versão 1 mantém o texto como a 1.0.3; da versão 2 em diante o espaço das pontas sai.
-		return node.getNode().typeVersion >= 2 ? raw.trim() : raw;
+		return node.getNode().typeVersion >= 2 ? text.trim() : text;
 	}
 
 	const value = plainValue(raw);
