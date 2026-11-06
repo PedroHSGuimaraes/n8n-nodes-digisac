@@ -88,7 +88,8 @@ describe('compatibilidade e documentação', () => {
 
 	it('K5.02 a versão do pacote e o changelog dizem 1.2.0', () => {
 		const pacote = JSON.parse(fs.readFileSync(path.join(raiz, 'package.json'), 'utf8'));
-		assert.equal(pacote.version, '1.2.0');
+		// A versão sobe a cada correção (a 1.2.1 é provada em path-ponto.test.cjs); aqui basta a linha 1.2.x.
+		assert.match(pacote.version, /^1\.2\.\d+$/);
 		const changelog = fs.readFileSync(path.join(raiz, 'CHANGELOG.md'), 'utf8');
 		assert.match(changelog, /^## 1\.2\.0/m);
 		// A seção 1.2.0 (e só ela) cita as 17 operações, os IDs estáveis e a confirmação de apagar.

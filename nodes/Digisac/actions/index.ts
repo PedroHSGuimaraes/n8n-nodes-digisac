@@ -836,15 +836,15 @@ function buildEndpointPath(
 	endpoint: DigisacEndpointDefinition,
 ): string {
 	const values = collectPathValues(node, i, endpoint);
-	// Kanban: "." e ".." não são IDs. O URL os resolve para fora do recurso (DELETE /kanban-boards/..
-	// cairia na raiz da API). Vale só para o Kanban: as 298 operações antigas seguem como estavam.
-	if (isKanbanEndpoint(endpoint)) {
-		const invalid = Object.entries(values).find(([, value]) => value === '.' || value === '..');
-		if (invalid) {
-			throw new NodeOperationError(node.getNode(), `${toTitle(invalid[0])} is not valid`, {
-				itemIndex: i,
-			});
-		}
+	// "." e ".." não são IDs. O URL os resolve para fora do recurso (DELETE /kanban-boards/.. cairia na
+	// raiz da API). Desde a 1.2.1 a recusa vale para as 315 operações, nas versões 1 e 2: este é o único
+	// ponto onde o caminho é montado, então uma checagem aqui cobre o catálogo inteiro e vem antes de
+	// qualquer requisição. Valor com ponto no meio (`a.b`) ou três pontos (`...`) não resolve para fora e passa.
+	const invalid = Object.entries(values).find(([, value]) => value === '.' || value === '..');
+	if (invalid) {
+		throw new NodeOperationError(node.getNode(), `${toTitle(invalid[0])} is not valid`, {
+			itemIndex: i,
+		});
 	}
 	const path = replaceTemplateVariables(endpoint.pathTemplate, values);
 
