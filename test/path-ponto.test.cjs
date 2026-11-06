@@ -18,11 +18,14 @@ const comCaminho = DIGISAC_ENDPOINTS.filter((e) => e.pathParams.length > 0);
 
 // Monta os parâmetros do node: o mesmo valor em todo parâmetro de caminho. Na versão 2 o valor
 // vai como Resource Locator (modo id); na versão 1 vai como texto.
-function parametrosCom(endpoint, valor, versao) {
+// Com `soEste`, só esse parâmetro leva o valor; os outros levam um ID válido ("ok"). Assim um
+// parâmetro que não é o primeiro também prova que a recusa o alcança.
+function parametrosCom(endpoint, valor, versao, soEste) {
 	const parametros = { operation: endpoint.id, [`confirmDelete_${endpoint.id}`]: true };
 	for (const parametro of endpoint.pathParams) {
+		const usado = soEste === undefined || soEste === parametro ? valor : 'ok';
 		parametros[`path_${endpoint.id}_${parametro}`] =
-			versao === 2 ? { mode: 'id', value: valor } : valor;
+			versao === 2 ? { mode: 'id', value: usado } : usado;
 	}
 	return parametros;
 }
@@ -40,18 +43,21 @@ describe('. e .. no parâmetro de caminho', () => {
 		for (const endpoint of comCaminho) {
 			for (const ponto of ['.', '..']) {
 				for (const versao of [1, 2]) {
-					const contexto = criarContexto(versao, parametrosCom(endpoint, ponto, versao));
-					await assert.rejects(
-						new Digisac().execute.call(contexto),
-						/is not valid/,
-						`${endpoint.id} ${endpoint.method} valor=${ponto} v${versao}`,
-					);
-					// A recusa vem antes de qualquer requisição ao Digisac.
-					assert.equal(
-						contexto.requisicoes.length,
-						0,
-						`${endpoint.id} valor=${ponto} v${versao}: não pode haver requisição`,
-					);
+					// Um caso por parâmetro: o valor inválido só nele, ID válido nos outros.
+					for (const parametro of endpoint.pathParams) {
+						const contexto = criarContexto(versao, parametrosCom(endpoint, ponto, versao, parametro));
+						await assert.rejects(
+							new Digisac().execute.call(contexto),
+							/is not valid/,
+							`${endpoint.id} ${endpoint.method} ${parametro}=${ponto} v${versao}`,
+						);
+						// A recusa vem antes de qualquer requisição ao Digisac.
+						assert.equal(
+							contexto.requisicoes.length,
+							0,
+							`${endpoint.id} ${parametro}=${ponto} v${versao}: não pode haver requisição`,
+						);
+					}
 				}
 			}
 		}
@@ -96,12 +102,16 @@ describe('. e .. no parâmetro de caminho', () => {
 		}
 		assert.equal(DIGISAC_ENDPOINTS.length, 315);
 		// Os 138 parâmetros de caminho continuam com o mesmo nome de campo no node, nas duas versões.
-		const nomes = new Digisac().description.properties.map((p) => p.name);
 		let parametros = 0;
 		for (const endpoint of comCaminho) {
 			for (const parametro of endpoint.pathParams) {
 				parametros += 1;
-				assert.ok(nomes.includes(`path_${endpoint.id}_${parametro}`), `${endpoint.id}/${parametro}`);
+				const campos = new Digisac().description.properties.filter(
+					(p) => p.name === `path_${endpoint.id}_${parametro}`,
+				);
+				assert.ok(campos.length > 0, `${endpoint.id}/${parametro}`);
+				// Na versão 1 o parâmetro continua sendo texto, como na 1.1.0.
+				assert.ok(campos.some((p) => p.type === 'string'), `${endpoint.id}/${parametro}: tipo`);
 			}
 		}
 		assert.equal(parametros, 138);
