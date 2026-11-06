@@ -34,7 +34,7 @@ const ORIGIN_VALUES = ['bot', 'user'];
 const NOT_SET = { name: 'Not Set', value: '' };
 
 /** Monta as opções de uma lista de alternativas, com a opção vazia primeiro. */
-function choiceOptions(values: string[]): INodeProperties['options'] {
+export function choiceOptions(values: string[]): INodeProperties['options'] {
 	return [NOT_SET, ...values.map((value) => ({ name: toTitle(value), value }))];
 }
 

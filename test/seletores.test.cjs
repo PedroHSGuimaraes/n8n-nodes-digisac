@@ -113,7 +113,9 @@ describe('IDs guiados na versão 2', () => {
 
 	it('S3.03 os 24 tipos restantes de path viram resourceLocator só com id', () => {
 		const tipos = new Set(DIGISAC_ENDPOINTS.flatMap((e) => e.pathParams));
-		const restantes = [...tipos].filter((t) => !(t in TIPOS_COM_LISTA));
+		// Quadro, coluna e card do Kanban têm lista própria (ver kanban-seletores.test.cjs).
+		const tiposKanban = new Set(['boardId', 'columnId', 'cardId']);
+		const restantes = [...tipos].filter((t) => !(t in TIPOS_COM_LISTA) && !tiposKanban.has(t));
 		assert.equal(restantes.length, 24);
 		for (const tipo of restantes) {
 			for (const operacao of DIGISAC_ENDPOINTS.filter((e) => e.pathParams.includes(tipo))) {
@@ -181,6 +183,9 @@ describe('IDs guiados na versão 2', () => {
 		let pares = 0;
 		for (const [chave, lista] of grupos) {
 			if (!lista.some((p) => p.displayOptions?.show?.['@version'])) continue;
+			// Campo auxiliar do Kanban (filterBoard_/filterColumn_) existe só na versão 2, sem par na 1;
+			// o teste K4.05 prova que ele fica oculto na v1.
+			if (lista.length === 1 && !visivelNaV1(lista[0])) continue;
 			pares += 1;
 			assert.equal(lista.filter(visivelNaV1).length, 1, `${chave}: deve ter 1 cópia na v1`);
 			assert.equal(lista.filter(visivelNaV2).length, 1, `${chave}: deve ter 1 cópia na v2`);

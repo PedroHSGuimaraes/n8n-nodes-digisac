@@ -1,5 +1,6 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const COLLECTION_URL =
 	'https://documenter.gw.postman.com/api/collections/53282970/2sBXihpXmF?segregateAuth=true&versionTag=latest';
@@ -58,13 +59,21 @@ function detectBase(raw) {
 	};
 }
 
-function normalizePath(value) {
+// Os dois PUT do Kanban (editar coluna e editar card) vêm da coleção como `/v1/kanban-...`, sem
+// o `/api` que as outras 15 rotas do Kanban e as outras 295 do node usam. Corrigimos só o prefixo
+// `/v1/kanban-`: as três rotas antigas `/v1/cards` (oportunidades do CRM) ficam como a 1.1.0 as
+// chama, porque mudar o caminho delas mudaria a versão 1 do node. A suposição do `/api` está
+// registrada no plano rotas-novas (Confirmed? n) e precisa de uma chamada real para ser confirmada.
+const KANBAN_SEM_API = /^\/v1\/kanban-/;
+
+export function normalizePath(value) {
 	if (!value) return '';
 	let out = value.trim();
 	if (out && !out.startsWith('/') && !out.startsWith('http')) {
 		out = `/${out}`;
 	}
-	return out.replace(/\/{2,}/g, '/');
+	out = out.replace(/\/{2,}/g, '/');
+	return KANBAN_SEM_API.test(out) ? `/api${out}` : out;
 }
 
 function splitUrl(raw) {
@@ -116,7 +125,7 @@ function rootLabel(root) {
 	return 'General';
 }
 
-function buildEndpoints(collection) {
+export function buildEndpoints(collection) {
 	const rawEndpoints = traverseItems(collection.item);
 	const endpoints = rawEndpoints.map((entry, index) => {
 		const root = rootLabel(entry.parents[0] ?? 'General');
@@ -168,6 +177,48 @@ function buildEndpoints(collection) {
 	});
 }
 
+// Chave que identifica uma rota entre duas gerações do catálogo: método + URL crua + pasta.
+function chaveDaRota(endpoint) {
+	return `${endpoint.method}|${endpoint.rawUrl}|${endpoint.sourcePath}`;
+}
+
+// Numera as rotas pelo catálogo anterior. O gerador antigo dava `e001`, `e002`... por posição na
+// coleção, então uma rota nova no meio trocava o ID de todas as seguintes. Workflow salvo guarda o
+// ID da operação (ex.: `e063`); se o ID passasse a apontar para outra rota, o workflow chamaria
+// outra chamada do Digisac em silêncio. Por isso toda rota já conhecida mantém o ID, e as novas
+// recebem os números seguintes ao maior ID existente, na ordem da coleção.
+// Rota repetida na coleção (mesma chave) consome um ID antigo por vez, na ordem em que aparecem.
+export function reuseIds(endpoints, previous) {
+	const idsPorChave = new Map();
+	let maior = 0;
+	for (const antigo of previous) {
+		const lista = idsPorChave.get(chaveDaRota(antigo)) ?? [];
+		lista.push(antigo.id);
+		idsPorChave.set(chaveDaRota(antigo), lista);
+		maior = Math.max(maior, Number(String(antigo.id).replace(/\D/g, '')));
+	}
+
+	return endpoints.map((endpoint) => {
+		const conhecido = idsPorChave.get(chaveDaRota(endpoint))?.shift();
+		if (conhecido) return { ...endpoint, id: conhecido };
+		maior += 1;
+		return { ...endpoint, id: `e${String(maior).padStart(3, '0')}` };
+	});
+}
+
+// Lê o `endpoints.ts` versionado e devolve a lista de rotas. Arquivo ausente (primeira geração) ou
+// ilegível devolve lista vazia: aí todos os IDs saem na numeração por posição, como antes.
+async function readPreviousEndpoints(outputPath) {
+	try {
+		const source = await readFile(outputPath, 'utf8');
+		const start = source.indexOf('= [', source.indexOf('DIGISAC_ENDPOINTS'));
+		const end = source.lastIndexOf('];');
+		return JSON.parse(source.slice(start + 2, end + 1));
+	} catch {
+		return [];
+	}
+}
+
 async function main() {
 	const response = await fetch(COLLECTION_URL);
 	if (!response.ok) {
@@ -175,8 +226,9 @@ async function main() {
 	}
 
 	const collection = await response.json();
-	const endpoints = buildEndpoints(collection);
 	const outputPath = path.resolve('nodes', 'Digisac', 'generated', 'endpoints.ts');
+	// Os IDs antigos vêm do arquivo versionado, para a numeração nova não trocar operação salva.
+	const endpoints = reuseIds(buildEndpoints(collection), await readPreviousEndpoints(outputPath));
 
 	await mkdir(path.dirname(outputPath), { recursive: true });
 	await writeFile(
@@ -213,7 +265,11 @@ async function main() {
 	console.log(`Generated ${endpoints.length} Digisac endpoints at ${outputPath}`);
 }
 
-main().catch((error) => {
-	console.error(error);
-	process.exit(1);
-});
+// Só roda o download quando o arquivo é executado direto (`npm run generate:endpoints`); os testes
+// importam as funções acima sem disparar a rede.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+	main().catch((error) => {
+		console.error(error);
+		process.exit(1);
+	});
+}

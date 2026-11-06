@@ -10,9 +10,9 @@ https://documenter.getpostman.com/view/53282970/2sBXihpXmF
 
 Resumo:
 
-- Total de chamadas documentadas: 298
-- Total de recursos/pastas no node: 51
-- Métodos: GET: 144 | POST: 93 | PUT: 34 | PATCH: 1 | DELETE: 26
+- Total de chamadas documentadas: 315
+- Total de recursos/pastas no node: 52
+- Métodos: GET: 150 | POST: 96 | PUT: 37 | PATCH: 3 | DELETE: 29
 
 ## Como ler esta tabela
 
@@ -58,6 +58,7 @@ Resumo:
 | Historico de chamados (Popular) | 9 |
 | Idioma da plataforma (General) | 1 |
 | Integracoes (General) | 2 |
+| Kanban (General) | 17 |
 | Mensagens (General) | 13 |
 | Mensagens (Popular) | 8 |
 | Mensagens interativas (General) | 7 |
@@ -435,6 +436,28 @@ Resumo:
 | --- | --- | --- | --- | --- |
 | `e148` | `GET` | `/api/v1/integrations` | Listar integracoes | - |
 | `e149` | `GET` | `/api/v1/integrations/{{integrationId}}` | Buscar integracao | path:integrationId |
+
+## Kanban (General)
+
+| ID | Método | Caminho | Operação | Parâmetros detectados |
+| --- | --- | --- | --- | --- |
+| `e299` | `GET` | `/api/v1/kanban-boards` | Listar quadros | - |
+| `e300` | `GET` | `/api/v1/kanban-boards/{{boardId}}` | Buscar quadro | path:boardId |
+| `e301` | `POST` | `/api/v1/kanban-boards` | Criar quadro | - |
+| `e302` | `PUT` | `/api/v1/kanban-boards/{{boardId}}` | Editar quadro | path:boardId |
+| `e303` | `DELETE` | `/api/v1/kanban-boards/{{boardId}}` | Excluir quadro | path:boardId |
+| `e304` | `GET` | `/api/v1/kanban-columns` | Listar colunas | query:boardId |
+| `e305` | `GET` | `/api/v1/kanban-columns/{{columnId}}` | Buscar coluna | path:columnId |
+| `e306` | `POST` | `/api/v1/kanban-columns` | Criar coluna | - |
+| `e307` | `PUT` | `/api/v1/kanban-columns/{{columnId}}` | Editar coluna | path:columnId |
+| `e308` | `DELETE` | `/api/v1/kanban-columns/{{columnId}}` | Excluir coluna | path:columnId |
+| `e309` | `PATCH` | `/api/v1/kanban-columns/{{columnId}}/reorder` | Reordenar coluna | path:columnId |
+| `e310` | `GET` | `/api/v1/kanban-cards` | Listar cards | query:columnId, query:userId |
+| `e311` | `GET` | `/api/v1/kanban-cards/{{cardId}}` | Buscar card | path:cardId |
+| `e312` | `POST` | `/api/v1/kanban-cards` | Criar card | - |
+| `e313` | `PUT` | `/api/v1/kanban-cards/{{cardId}}` | Editar card | path:cardId |
+| `e314` | `DELETE` | `/api/v1/kanban-cards/{{cardId}}` | Excluir card | path:cardId |
+| `e315` | `PATCH` | `/api/v1/kanban-cards/{{cardId}}/reorder` | Reordenar card | path:cardId |
 
 ## Mensagens (General)
 

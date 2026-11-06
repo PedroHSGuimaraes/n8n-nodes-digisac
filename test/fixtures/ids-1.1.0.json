@@ -1,0 +1,1790 @@
+[
+	{
+		"id": "e001",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/bots/{{botId}}/trigger-signal/{{contactId}}?flag=flagAqui",
+		"sourcePath": "Gerais > Acionamento flag no robo > Acionamento flag no robo"
+	},
+	{
+		"id": "e002",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/schedule?perPage=40",
+		"sourcePath": "Gerais > Agendamentos > Listar agendamentos"
+	},
+	{
+		"id": "e003",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/schedule/{{scheduleId}}",
+		"sourcePath": "Gerais > Agendamentos > Buscar agendamento"
+	},
+	{
+		"id": "e004",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/schedule/{{scheduleId}}",
+		"sourcePath": "Gerais > Agendamentos > Editar agendamento"
+	},
+	{
+		"id": "e005",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/schedule",
+		"sourcePath": "Gerais > Agendamentos > Criar agendamento"
+	},
+	{
+		"id": "e006",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/schedule/{{scheduleId}}",
+		"sourcePath": "Gerais > Agendamentos > Excluir agendamento"
+	},
+	{
+		"id": "e007",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/departments-resume",
+		"sourcePath": "Gerais > Agora > Buscar departamentos (Agora)"
+	},
+	{
+		"id": "e008",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/attendance-resume",
+		"sourcePath": "Gerais > Agora > Buscar atendentes (Agora)"
+	},
+	{
+		"id": "e009",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/resume",
+		"sourcePath": "Gerais > Agora > Buscar todos os dados (Agora)"
+	},
+	{
+		"id": "e010",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/ticket-topics?perPage=40",
+		"sourcePath": "Gerais > Assuntos de chamado > Listar assuntos de fechamento"
+	},
+	{
+		"id": "e011",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/ticket-topics/{{ticketTopicId}}",
+		"sourcePath": "Gerais > Assuntos de chamado > Buscar um assunto especifico"
+	},
+	{
+		"id": "e012",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/ticket-topics/{{ticketTopicId}}",
+		"sourcePath": "Gerais > Assuntos de chamado > Editar assunto especifico"
+	},
+	{
+		"id": "e013",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/ticket-topics",
+		"sourcePath": "Gerais > Assuntos de chamado > Criar assunto"
+	},
+	{
+		"id": "e014",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/ticket-topics/{{ticketTopicId}}",
+		"sourcePath": "Gerais > Assuntos de chamado > Excluir assunto especifico"
+	},
+	{
+		"id": "e015",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/auth-history?perPage=40",
+		"sourcePath": "Gerais > Auditoria de autenticacao > Listar auditorias de autenticacao"
+	},
+	{
+		"id": "e016",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/auth-history/{{authId}}",
+		"sourcePath": "Gerais > Auditoria de autenticacao > Buscar auditoria de autenticacao"
+	},
+	{
+		"id": "e017",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/oauth/token",
+		"sourcePath": "Gerais > Autorizacao > Gerar Token de acesso"
+	},
+	{
+		"id": "e018",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/questions?perPage=40",
+		"sourcePath": "Gerais > Avaliacoes > Listar avaliacoes"
+	},
+	{
+		"id": "e019",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/questions/{{questionId}}",
+		"sourcePath": "Gerais > Avaliacoes > Buscar avaliacao"
+	},
+	{
+		"id": "e020",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/questions/{{questionId}}",
+		"sourcePath": "Gerais > Avaliacoes > Editar avaliacao"
+	},
+	{
+		"id": "e021",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/questions",
+		"sourcePath": "Gerais > Avaliacoes > Criar avaliacao"
+	},
+	{
+		"id": "e022",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/questions/{{questionId}}",
+		"sourcePath": "Gerais > Avaliacoes > Excluir avaliacao"
+	},
+	{
+		"id": "e023",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/campaigns?perPage=40",
+		"sourcePath": "Gerais > Campanhas > Listar campanhas"
+	},
+	{
+		"id": "e024",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/campaigns/{{campaignsId}}",
+		"sourcePath": "Gerais > Campanhas > Buscar campanha"
+	},
+	{
+		"id": "e025",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/campaigns/{{campaignId}}/stats",
+		"sourcePath": "Gerais > Campanhas > Extrair status de uma campanha"
+	},
+	{
+		"id": "e026",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/campaigns?query={\"where\":{\"$and\":[{\"createdAt\":{\"$gte\":\"{{2024-05-07T00:00:00.000Z}}\"}},{\"createdAt\":{\"$lte\":\"{{2024-05-07T23:00:00.000Z}}\"}}]},\"order\":[[\"createdAt\",\"DESC\"]],\"include\":[\"service\",\"tags\",{\"model\":\"messages\",\"include\":\"file\"},{\"model\":\"createdBy\",\"attributes\":[\"id\",\"name\"]},{\"model\":\"sentBy\",\"attributes\":[\"id\",\"name\"]}],\"page\":1,\"perPage\":15}",
+		"sourcePath": "Gerais > Campanhas > Visualizar quem criou e enviou uma campanha"
+	},
+	{
+		"id": "e027",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/campaigns/{{campaignsId}}",
+		"sourcePath": "Gerais > Campanhas > Editar campanha"
+	},
+	{
+		"id": "e028",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/campaigns/export/csv",
+		"sourcePath": "Gerais > Campanhas > Exportar resultados da campanha"
+	},
+	{
+		"id": "e029",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/campaigns/{{campaignsId}}",
+		"sourcePath": "Gerais > Campanhas > Excluir campanha"
+	},
+	{
+		"id": "e030",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/custom-fields?perPage=40",
+		"sourcePath": "Gerais > Campos personalizados > Listar campos personalizados"
+	},
+	{
+		"id": "e031",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/custom-fields/{{customFieldsId}}",
+		"sourcePath": "Gerais > Campos personalizados > Buscar campo personalizado"
+	},
+	{
+		"id": "e032",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/custom-fields/{{customFieldsId}}",
+		"sourcePath": "Gerais > Campos personalizados > Editar campo personalizado"
+	},
+	{
+		"id": "e033",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/custom-fields",
+		"sourcePath": "Gerais > Campos personalizados > Criar campo personalizado"
+	},
+	{
+		"id": "e034",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/custom-fields/{{customFieldsId}}",
+		"sourcePath": "Gerais > Campos personalizados > Excluir campo personalizado"
+	},
+	{
+		"id": "e035",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/roles?perPage=40",
+		"sourcePath": "Gerais > Cargos > Listar cargos"
+	},
+	{
+		"id": "e036",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/roles/{{roleId}}",
+		"sourcePath": "Gerais > Cargos > Buscar cargo"
+	},
+	{
+		"id": "e037",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/roles/{{roleId}}?include=permissions",
+		"sourcePath": "Gerais > Cargos > Buscar permissoes do cargo"
+	},
+	{
+		"id": "e038",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/users/{{roleId}}?include=roles",
+		"sourcePath": "Gerais > Cargos > Buscar cargos do usuario"
+	},
+	{
+		"id": "e039",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/roles/{{roleId}}",
+		"sourcePath": "Gerais > Cargos > Editar cargo"
+	},
+	{
+		"id": "e040",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/roles",
+		"sourcePath": "Gerais > Cargos > Criar cargo"
+	},
+	{
+		"id": "e041",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/roles/{{roleId}}",
+		"sourcePath": "Gerais > Cargos > Excluir cargo"
+	},
+	{
+		"id": "e042",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/notifications?perPage=40",
+		"sourcePath": "Gerais > Central de notificacoes > Listar central de notificacoes"
+	},
+	{
+		"id": "e043",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/notifications/read-all",
+		"sourcePath": "Gerais > Central de notificacoes > Marcar todas as notificacoes como lidas"
+	},
+	{
+		"id": "e044",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?where[contactId]={{contactId}}",
+		"sourcePath": "Gerais > Chamados > Buscar chamados do contato"
+	},
+	{
+		"id": "e045",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"where\":{\"contactId\":\"{{contactId}}\"},\"attributes\":[\"id\",\"isOpen\",\"protocol\",\"origin\",\"startedAt\",\"endedAt\"],\"include\":[{\"model\":\"ticketTransfers\",\"attributes\":[\"action\",\"fromDistribution\"],\"include\":[{\"model\":\"byUser\",\"attributes\":[\"id\",\"name\",\"email\",\"status\"]}]}],\"perPage\":50}",
+		"sourcePath": "Gerais > Chamados > Buscar pelo contactid todos os chamados do cliente trazendo quem encerrou/transferiu"
+	},
+	{
+		"id": "e046",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/transfer",
+		"sourcePath": "Gerais > Chamados > Transferencia de chamado"
+	},
+	{
+		"id": "e047",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/ticket/bulk-transfer",
+		"sourcePath": "Gerais > Chamados > Transferencia de Transferencia em massa"
+	},
+	{
+		"id": "e048",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/transfer",
+		"sourcePath": "Gerais > Chamados > Abertura de chamado"
+	},
+	{
+		"id": "e049",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/close",
+		"sourcePath": "Gerais > Chamados > Fechar chamado"
+	},
+	{
+		"id": "e050",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/close",
+		"sourcePath": "Gerais > Chamados > Fechar um chamado com assunto"
+	},
+	{
+		"id": "e051",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/services?perPage=35",
+		"sourcePath": "Gerais > Conexoes > Listar conexoes"
+	},
+	{
+		"id": "e052",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}",
+		"sourcePath": "Gerais > Conexoes > Buscar conexao"
+	},
+	{
+		"id": "e053",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/services?query={\"where\":{\"archivedAt\":{\"$eq\":null}},\"order\":[[\"name\",\"asc\"]],\"page\":1,\"perPage\":50}",
+		"sourcePath": "Gerais > Conexoes > Buscar conexoes ativas"
+	},
+	{
+		"id": "e054",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}",
+		"sourcePath": "Gerais > Conexoes > Editar conexao"
+	},
+	{
+		"id": "e055",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}/archive",
+		"sourcePath": "Gerais > Conexoes > Arquivar conexao"
+	},
+	{
+		"id": "e056",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/services",
+		"sourcePath": "Gerais > Conexoes > Criar conexao"
+	},
+	{
+		"id": "e057",
+		"method": "POST",
+		"rawUrl": "{{URL}}api/v1/services/{{serviceId}}/shutdown",
+		"sourcePath": "Gerais > Conexoes > Desligar conexao"
+	},
+	{
+		"id": "e058",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}/start",
+		"sourcePath": "Gerais > Conexoes > Iniciar conexao"
+	},
+	{
+		"id": "e059",
+		"method": "POST",
+		"rawUrl": "{{URL}}api/v1/services/{{serviceId}}/restart",
+		"sourcePath": "Gerais > Conexoes > Reiniciar conexao"
+	},
+	{
+		"id": "e060",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}/logout",
+		"sourcePath": "Gerais > Conexoes > Gerar QR Code"
+	},
+	{
+		"id": "e061",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/services/{{serviceId}}",
+		"sourcePath": "Gerais > Conexoes > Excluir conexao"
+	},
+	{
+		"id": "e062",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?perPage=40",
+		"sourcePath": "Gerais > Contatos > Listar todos os contatos"
+	},
+	{
+		"id": "e063",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?where[serviceId]={{serviceId}}?perPage=40",
+		"sourcePath": "Gerais > Contatos > Listar contatos da conexao"
+	},
+	{
+		"id": "e064",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Buscar contato"
+	},
+	{
+		"id": "e065",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?where[data.number][$iLike]=%{{number}}%&where[serviceId]={{serviceId}}",
+		"sourcePath": "Gerais > Contatos > Buscar contato por numero de uma conexao especifica"
+	},
+	{
+		"id": "e066",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}?include[0]=tags&include[1]=",
+		"sourcePath": "Gerais > Contatos > Buscar tags vinculadas a um contato"
+	},
+	{
+		"id": "e067",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"customFieldValues\",\"include\":[{\"model\":\"customField\",\"where\":{\"name\":\"{{customFieldName}}\"}}]}]}",
+		"sourcePath": "Gerais > Contatos > Buscar contatos vinculados ao Campo Personalizado"
+	},
+	{
+		"id": "e068",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"customFieldValues\",\"include\":[{\"model\":\"customField\",\"where\":{\"$or\":[{\"name\":\"{{customFieldName1}}\"},{\"name\":\"{{customFieldName2}}\"},{\"name\":\"{{customFieldName3}}\"},{\"name\":\"{{customFieldName4}}\"}]}}]}]}",
+		"sourcePath": "Gerais > Contatos > Busca de contatos que possuem X campos personalizados preenchidos"
+	},
+	{
+		"id": "e069",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"person\",\"required\":\"true\",\"where\":{\"id\":\"{{organizationId}}\"}}],\"perPage\":\"30\"}",
+		"sourcePath": "Gerais > Contatos > Buscar contatos vinculados a Organizacao"
+	},
+	{
+		"id": "e070",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"person\",\"required\":\"true\",\"where\":{\"id\":\"{{personId}}\"}}],\"perPage\":\"30\"}",
+		"sourcePath": "Gerais > Contatos > Buscar contatos vinculados a Pessoa"
+	},
+	{
+		"id": "e071",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Editar contato"
+	},
+	{
+		"id": "e072",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Editar tag do contato"
+	},
+	{
+		"id": "e073",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Editar campo personalizado de um contato"
+	},
+	{
+		"id": "e074",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Incluir tags em um contato existente"
+	},
+	{
+		"id": "e075",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts",
+		"sourcePath": "Gerais > Contatos > Cadastrar contato"
+	},
+	{
+		"id": "e076",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/many",
+		"sourcePath": "Gerais > Contatos > Cadastrar multiplos contatos"
+	},
+	{
+		"id": "e077",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/export/csv",
+		"sourcePath": "Gerais > Contatos > Exportar contatos"
+	},
+	{
+		"id": "e078",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/count",
+		"sourcePath": "Gerais > Contatos > Total de contatos com filtros"
+	},
+	{
+		"id": "e079",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/sync",
+		"sourcePath": "Gerais > Contatos > Sincroniza contato"
+	},
+	{
+		"id": "e080",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/block",
+		"sourcePath": "Gerais > Contatos > Bloquear contato"
+	},
+	{
+		"id": "e081",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/block",
+		"sourcePath": "Gerais > Contatos > Desbloquear contato"
+	},
+	{
+		"id": "e082",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Contatos > Excluir contato"
+	},
+	{
+		"id": "e083",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/contacts/many",
+		"sourcePath": "Gerais > Contatos > Exclui multiplos contatos"
+	},
+	{
+		"id": "e084",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/absence?filters[createdAt]={{2024-04-09T12:50:49.385}}Z&filters[endedAt]={{2024-04-16T12:50:49.385}}Z&include=user&page=1000&perPage=40",
+		"sourcePath": "Gerais > Controle de ausencia > Listar ausencias"
+	},
+	{
+		"id": "e085",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/credit-movements?perPage=40",
+		"sourcePath": "Gerais > Creditos SMS > Listagem de creditos"
+	},
+	{
+		"id": "e086",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/credit-movements/balances",
+		"sourcePath": "Gerais > Creditos SMS > Balanco"
+	},
+	{
+		"id": "e087",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/credit-movements/{{movementId}}",
+		"sourcePath": "Gerais > Creditos SMS > Buscar uma movimentacao expecifica"
+	},
+	{
+		"id": "e088",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/departments?perPage=40",
+		"sourcePath": "Gerais > Departamentos > Listar departamentos"
+	},
+	{
+		"id": "e089",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/departments/{{departmentId}}",
+		"sourcePath": "Gerais > Departamentos > Buscar departamento"
+	},
+	{
+		"id": "e090",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/departments/{{departmentId}}",
+		"sourcePath": "Gerais > Departamentos > Editar departamento"
+	},
+	{
+		"id": "e091",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/departments",
+		"sourcePath": "Gerais > Departamentos > Criar departamento"
+	},
+	{
+		"id": "e092",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/departments/{{departmentId}}/archive",
+		"sourcePath": "Gerais > Departamentos > Arquivar departamento"
+	},
+	{
+		"id": "e093",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/departments/{{departmentId}}",
+		"sourcePath": "Gerais > Departamentos > Excluir departamento"
+	},
+	{
+		"id": "e094",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/distribution?perPage=40",
+		"sourcePath": "Gerais > Distribuicao de chamados > Listas distribuicoes de chamados"
+	},
+	{
+		"id": "e095",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/distribution/{{distributionId}}",
+		"sourcePath": "Gerais > Distribuicao de chamados > Buscar distribuicao de chamados"
+	},
+	{
+		"id": "e096",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/distribution/{{distributionId}}",
+		"sourcePath": "Gerais > Distribuicao de chamados > Editar distribuicao de chamados"
+	},
+	{
+		"id": "e097",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/distribution",
+		"sourcePath": "Gerais > Distribuicao de chamados > Criar distribuicao de chamados - Fila"
+	},
+	{
+		"id": "e098",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/distribution",
+		"sourcePath": "Gerais > Distribuicao de chamados > Criar distribuicao de chamados - Padrao"
+	},
+	{
+		"id": "e099",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/distribution/{{distributionId}}",
+		"sourcePath": "Gerais > Distribuicao de chamados > Excluir distribuicao de chamados"
+	},
+	{
+		"id": "e100",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-01-01T23:59:59.999Z}}&endPeriod={{2023-01-02T23:59:59.999Z}}&grouping=&departmentId=all&userId=all&periodType=openDate&departmentParticipation=last&userParticipation=last&status=all",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por periodo"
+	},
+	{
+		"id": "e101",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&serviceId={{serviceId}}",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por conexao"
+	},
+	{
+		"id": "e102",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por departamento"
+	},
+	{
+		"id": "e103",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&userId={{userId}}",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por usuario"
+	},
+	{
+		"id": "e104",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}&userId={{userId}}",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por dpt + usuario"
+	},
+	{
+		"id": "e105",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&periodType=open",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por data de abertura"
+	},
+	{
+		"id": "e106",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&periodType=close",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas por data de fechamento"
+	},
+	{
+		"id": "e107",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&status=open",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas dos chamados abertos"
+	},
+	{
+		"id": "e108",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&status=close",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas dos chamados fechados"
+	},
+	{
+		"id": "e109",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}&userId={{userId}}&periodType={{open/close}}Date&departmentParticipation={{last/middle}}&userParticipation={{last/middle}}&status={{all/open/close}}&serviceId={{serviceId}}",
+		"sourcePath": "Gerais > Estatisticas de atendimento > Buscar estatisticas com todos os filtros ativos"
+	},
+	{
+		"id": "e110",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes sem filtro"
+	},
+	{
+		"id": "e111",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?startPeriod={{2024-01-01T23:59:59.999Z}}&endPeriod={{2023-01-02T23:59:59.999Z}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes por periodo"
+	},
+	{
+		"id": "e112",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?serviceId={{serviceId}}&periodType={{all/close/open}}&from={{2024-07-30T18:01:07.341Z}}&to={{2024-08-06T18:01:07.341Z}}&type={{csat/nps}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes por conexao"
+	},
+	{
+		"id": "e113",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?departmentId={{departmentId}}&from={{2024-07-30T18:01:07.341Z}}&to={{2024-08-06T18:01:07.341Z}}&type={{csat/nps}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes por departamento"
+	},
+	{
+		"id": "e114",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?userId={{userId}}&from={{2024-07-30T18:01:07.341Z}}&to={{2024-08-06T18:01:07.341Z}}&type={{csat/nps}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes por usuario"
+	},
+	{
+		"id": "e115",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?userId={{userId}}&departmentId={{departmentId}}&from={{2024-07-30T18:01:07.341Z}}&to={{2024-08-06T18:01:07.341Z}}&type={{csat/nps}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes por dpt + usuario"
+	},
+	{
+		"id": "e116",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/answers/overview?userId={{userId}}&departmentId={{departmentId}}&serviceId={{serviceId}}&periodType={{all/close/open}}&from={{2024-07-30T18:01:07.341Z}}&to={{2024-08-06T18:01:07.341Z}}&type={{csat/nps}}",
+		"sourcePath": "Gerais > Estatisticas de avaliacoes > Buscar avaliacoes com todos os filtros ativos"
+	},
+	{
+		"id": "e117",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/holiday?perPage=40",
+		"sourcePath": "Gerais > Feriados > Listar feriados"
+	},
+	{
+		"id": "e118",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/holiday/{{holidayId}}",
+		"sourcePath": "Gerais > Feriados > Buscar feriado"
+	},
+	{
+		"id": "e119",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/holiday/{{holidayId}}",
+		"sourcePath": "Gerais > Feriados > Editar feriado"
+	},
+	{
+		"id": "e120",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/holiday",
+		"sourcePath": "Gerais > Feriados > Criar feriado"
+	},
+	{
+		"id": "e121",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/holiday/{{holidayId}}",
+		"sourcePath": "Gerais > Feriados > Excluir feriado"
+	},
+	{
+		"id": "e122",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/pipelines?perPage=30",
+		"sourcePath": "Gerais > Funil de vendas > Listar funis de vendas"
+	},
+	{
+		"id": "e123",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/pipelines/{{pipelineId}}",
+		"sourcePath": "Gerais > Funil de vendas > Buscar funil de vendas"
+	},
+	{
+		"id": "e124",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/pipelines",
+		"sourcePath": "Gerais > Funil de vendas > Criar funil de vendas"
+	},
+	{
+		"id": "e125",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/pipelines/{{pipelineId}}",
+		"sourcePath": "Gerais > Funil de vendas > Editar funil de vendas"
+	},
+	{
+		"id": "e126",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/pipelines/{{pipelineId}}",
+		"sourcePath": "Gerais > Funil de vendas > Apagar funil de vendas"
+	},
+	{
+		"id": "e127",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/cards?query={\"where\":{\"pipelineId\":\"{{pipelineId}}\"}}",
+		"sourcePath": "Gerais > Funil de vendas > Listar oportunidades"
+	},
+	{
+		"id": "e128",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/cards/{{cardsId}}",
+		"sourcePath": "Gerais > Funil de vendas > Buscar oportunidades"
+	},
+	{
+		"id": "e129",
+		"method": "POST",
+		"rawUrl": "{{URL}}/v1/cards",
+		"sourcePath": "Gerais > Funil de vendas > Criar oportunidade"
+	},
+	{
+		"id": "e130",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/v1/cards/{{cardsId}}",
+		"sourcePath": "Gerais > Funil de vendas > Editar oportunidade"
+	},
+	{
+		"id": "e131",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/v1/cards/{{cardsId}}",
+		"sourcePath": "Gerais > Funil de vendas > Apagar oportunidade"
+	},
+	{
+		"id": "e132",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/add-members",
+		"sourcePath": "Gerais > Grupos WhatsApp > Adicionar participante"
+	},
+	{
+		"id": "e133",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/promote-members",
+		"sourcePath": "Gerais > Grupos WhatsApp > Atribuir cargo de administrador"
+	},
+	{
+		"id": "e134",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts",
+		"sourcePath": "Gerais > Grupos WhatsApp > Criar novo grupo"
+	},
+	{
+		"id": "e135",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/demote-members",
+		"sourcePath": "Gerais > Grupos WhatsApp > Remover permissoes de administrador"
+	},
+	{
+		"id": "e136",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"where\":{\"isOpen\":true},\"include\":[{\"model\":\"contact\",\"required\":true,\"where\":{\"visible\":true,\"id\":\"{{contactId}}\"}}]}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados abertos por contactid"
+	},
+	{
+		"id": "e137",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"where\":{\"isOpen\":true,\"departmentId\":\"{{departmentId}}\"},\"include\":[{\"model\":\"contact\",\"required\":true,\"where\":{\"visible\":true}}],\"order\":[[\"updatedAt\",\"DESC\"]],\"page\":1,\"perPage\":15}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados abertos por departamento"
+	},
+	{
+		"id": "e138",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets/{{ticketId}}?include[0][model]=contact&include[0][include][0]=avatar&include[0][include][1]=thumbAvatar&include[1]=department&include[2]=user&include[3]=ticketTopics",
+		"sourcePath": "Gerais > Historico de chamados > Buscar por um chamado especifico"
+	},
+	{
+		"id": "e139",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?startPeriod={{2024-01-01T23:59:59.999Z}}&endPeriod={{2023-01-02T23:59:59.999Z}}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados por periodo"
+	},
+	{
+		"id": "e140",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":true},\"include\":[{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados abertos por conexao"
+	},
+	{
+		"id": "e141",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":false},\"include\":[{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados fechados por conexao"
+	},
+	{
+		"id": "e142",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":{\"$in\":[true,false]}},\"include\":[{\"model\":\"contact\",\"attributes\":[\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Gerais > Historico de chamados > Buscar chamados abertos + fechados por conexao"
+	},
+	{
+		"id": "e143",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{},\"include\":[{\"model\":\"account\"},{\"model\":\"firstMessage\",\"attributes\":[\"id\",\"type\",\"text\",\"timestamp\",\"isFromMe\",\"sent\",\"data\",\"accountId\",\"serviceId\",\"contactId\",\"fromId\",\"toId\",\"userId\",\"ticketId\",\"isFromBot\",\"isFromSync\",\"visible\",\"ticketUserId\",\"ticketDepartmentId\",\"origin\",\"botId\",\"campaignId\"]},{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true},{\"model\":\"tags\",\"attributes\":[\"id\",\"label\",\"accountId\"]},{\"model\":\"person\",\"attributes\":[\"id\",\"name\",\"document\",\"accountId\"]},{\"model\":\"thumbAvatar\"}]},{\"model\":\"user\",\"attributes\":[\"id\",\"name\",\"email\",\"isSuperAdmin\",\"active\",\"accountId\",\"isFirstLogin\",\"status\",\"timetableId\",\"archivedAt\",\"phoneNumber\",\"data\",\"language\",\"isActiveInternalChat\"]},{\"model\":\"department\",\"attributes\":[\"id\",\"name\",\"accountId\",\"archivedAt\",\"distributionId\"]},{\"model\":\"ticketTopics\",\"attributes\":[\"id\",\"name\",\"archivedAt\"]}]}&perPage=30",
+		"sourcePath": "Gerais > Historico de chamados > Buscar todos os chamados da plataforma"
+	},
+	{
+		"id": "e144",
+		"method": "GET",
+		"rawUrl": "{{URL}}/pdf/tickets/{{ticketId}}/pt-BR?pdf=1&lng=pt-BR",
+		"sourcePath": "Gerais > Historico de chamados > Exportar historico de chamados em PDF"
+	},
+	{
+		"id": "e145",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tickets/export",
+		"sourcePath": "Gerais > Historico de chamados > Exportar historico de chamados em TXT"
+	},
+	{
+		"id": "e146",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tickets/export-history?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{},\"include\":[{\"model\":\"firstMessage\",\"attributes\":[\"id\",\"type\",\"text\",\"timestamp\",\"isFromMe\",\"sent\",\"data\",\"accountId\",\"serviceId\",\"contactId\",\"fromId\",\"toId\",\"userId\",\"ticketId\",\"isFromBot\",\"isFromSync\",\"visible\",\"ticketUserId\",\"ticketDepartmentId\",\"origin\",\"botId\",\"campaignId\"]},{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true},{\"model\":\"tags\",\"attributes\":[\"id\",\"label\",\"accountId\"]},{\"model\":\"person\",\"attributes\":[\"id\",\"name\",\"document\",\"accountId\"]}]},{\"model\":\"user\",\"attributes\":[\"id\",\"name\",\"email\",\"isSuperAdmin\",\"active\",\"accountId\",\"isFirstLogin\",\"status\",\"timetableId\",\"archivedAt\",\"phoneNumber\",\"data\",\"language\",\"isActiveInternalChat\"]},{\"model\":\"department\",\"attributes\":[\"id\",\"name\",\"accountId\",\"archivedAt\",\"distributionId\"]},{\"model\":\"ticketTopics\",\"attributes\":[\"id\",\"name\",\"archivedAt\"]}]}",
+		"sourcePath": "Gerais > Historico de chamados > Exportar historico de chamados em CSV"
+	},
+	{
+		"id": "e147",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tickets/export-history?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{},\"include\":[{\"model\":\"firstMessage\",\"attributes\":[\"id\",\"type\",\"text\",\"timestamp\",\"isFromMe\",\"sent\",\"data\",\"accountId\",\"serviceId\",\"contactId\",\"fromId\",\"toId\",\"userId\",\"ticketId\",\"isFromBot\",\"isFromSync\",\"visible\",\"ticketUserId\",\"ticketDepartmentId\",\"origin\",\"botId\",\"campaignId\"]},{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{servieId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true},{\"model\":\"tags\",\"attributes\":[\"id\",\"label\",\"accountId\"]},{\"model\":\"person\",\"attributes\":[\"id\",\"name\",\"document\",\"accountId\"]}]},{\"model\":\"user\",\"attributes\":[\"id\",\"name\",\"email\",\"isSuperAdmin\",\"active\",\"accountId\",\"isFirstLogin\",\"status\",\"timetableId\",\"archivedAt\",\"phoneNumber\",\"data\",\"language\",\"isActiveInternalChat\"]},{\"model\":\"department\",\"attributes\":[\"id\",\"name\",\"accountId\",\"archivedAt\",\"distributionId\"]},{\"model\":\"ticketTopics\",\"attributes\":[\"id\",\"name\",\"archivedAt\"]}]}",
+		"sourcePath": "Gerais > Historico de chamados > Exportar historico de chamados de uma conexao especifica em CSV"
+	},
+	{
+		"id": "e148",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/integrations?perPage=40",
+		"sourcePath": "Gerais > Integracoes > Listar integracoes"
+	},
+	{
+		"id": "e149",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/integrations/{{integrationId}}",
+		"sourcePath": "Gerais > Integracoes > Buscar integracao"
+	},
+	{
+		"id": "e150",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/me",
+		"sourcePath": "Gerais > Idioma da plataforma > Editar idioma da plataforma"
+	},
+	{
+		"id": "e151",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/messages?perPage=40",
+		"sourcePath": "Gerais > Mensagens > Listar mensagens"
+	},
+	{
+		"id": "e152",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/messages?where[contactId]={{contactId}}",
+		"sourcePath": "Gerais > Mensagens > Buscar total de mensagens do contato"
+	},
+	{
+		"id": "e153",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/messages/{{messageId}}?include[0]=file",
+		"sourcePath": "Gerais > Mensagens > Buscar mensagem include=file"
+	},
+	{
+		"id": "e154",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar mensagem para contato ja cadastrado"
+	},
+	{
+		"id": "e155",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar mensagem para contato nao cadastrado"
+	},
+	{
+		"id": "e156",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar mensagem SEM abrir o chamado"
+	},
+	{
+		"id": "e157",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar comentario"
+	},
+	{
+		"id": "e158",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar de mensagem usando bot e sem abrir chamado"
+	},
+	{
+		"id": "e159",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar imagem"
+	},
+	{
+		"id": "e160",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar PDF"
+	},
+	{
+		"id": "e161",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens > Enviar audio"
+	},
+	{
+		"id": "e162",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages/{{messageId}}/send-reaction",
+		"sourcePath": "Gerais > Mensagens > Reagir a uma mensagem"
+	},
+	{
+		"id": "e163",
+		"method": "PATCH",
+		"rawUrl": "{{URL}}/api/v1/messages/messageId",
+		"sourcePath": "Gerais > Mensagens > Editar mensagem"
+	},
+	{
+		"id": "e164",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/interactive-messages?perPage=40",
+		"sourcePath": "Gerais > Mensagens interativas > Listar mensagens interativas"
+	},
+	{
+		"id": "e165",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/interactive-messages/{{interactiveMessagesId}}",
+		"sourcePath": "Gerais > Mensagens interativas > Buscar mensagem interativa"
+	},
+	{
+		"id": "e166",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/interactive-messages",
+		"sourcePath": "Gerais > Mensagens interativas > Criar mensagem interativa em lista"
+	},
+	{
+		"id": "e167",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/interactive-messages",
+		"sourcePath": "Gerais > Mensagens interativas > Criar mensagem interativa com imagem"
+	},
+	{
+		"id": "e168",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens interativas > Enviar mensagem interativa com botao"
+	},
+	{
+		"id": "e169",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Mensagens interativas > Enviar mensagem interativa"
+	},
+	{
+		"id": "e170",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/interactive-messages/{{interactiveMessagesId}}",
+		"sourcePath": "Gerais > Mensagens interativas > Excluir mensagem interativa"
+	},
+	{
+		"id": "e171",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/me",
+		"sourcePath": "Gerais > Meus dados > Buscar meus dados"
+	},
+	{
+		"id": "e172",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Notificacao > Marcar como nao lido"
+	},
+	{
+		"id": "e173",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Notificacao > Notificacao mensagens receptivas"
+	},
+	{
+		"id": "e174",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Gerais > Notificacao > Silenciar contato"
+	},
+	{
+		"id": "e175",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/organizations?perPage=40",
+		"sourcePath": "Gerais > Organizacoes > Listar organizacoes"
+	},
+	{
+		"id": "e176",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/organizations/{{organizationId}}",
+		"sourcePath": "Gerais > Organizacoes > Buscar organizacao"
+	},
+	{
+		"id": "e177",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/organizations/{{organizationId}}",
+		"sourcePath": "Gerais > Organizacoes > Editar organizacao"
+	},
+	{
+		"id": "e178",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/organizations",
+		"sourcePath": "Gerais > Organizacoes > Criar organizacao"
+	},
+	{
+		"id": "e179",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/organizations/{{organizationId}}",
+		"sourcePath": "Gerais > Organizacoes > Excluir organizacao"
+	},
+	{
+		"id": "e180",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/people?perPage=40",
+		"sourcePath": "Gerais > Pessoas > Listar pessoas"
+	},
+	{
+		"id": "e181",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/people/{{peopleId}}",
+		"sourcePath": "Gerais > Pessoas > Buscar pessoa"
+	},
+	{
+		"id": "e182",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/people/{{peopleId}}",
+		"sourcePath": "Gerais > Pessoas > Editar pessoa"
+	},
+	{
+		"id": "e183",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/people",
+		"sourcePath": "Gerais > Pessoas > Criar pessoa"
+	},
+	{
+		"id": "e184",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/people/{{peopleId}}",
+		"sourcePath": "Gerais > Pessoas > Excluir pessoa"
+	},
+	{
+		"id": "e185",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/plans",
+		"sourcePath": "Gerais > Planos > Listar planos"
+	},
+	{
+		"id": "e186",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/plans/{{planId}}",
+		"sourcePath": "Gerais > Planos > Buscar plano"
+	},
+	{
+		"id": "e187",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/reset-password/request",
+		"sourcePath": "Gerais > Redefinir senha > Solicitar uma nova senha"
+	},
+	{
+		"id": "e188",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/quick-replies?perPage=40",
+		"sourcePath": "Gerais > Respostas rapidas > Listar respostas rapidas"
+	},
+	{
+		"id": "e189",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/quick-replies?query={\"attributes\":[\"id\",\"text\"],\"include\":[{\"model\":\"departments\",\"attributes\":[\"name\",\"id\"],\"through\":{\"attributes\":[]}}],\"perPage\":40}",
+		"sourcePath": "Gerais > Respostas rapidas > Listar textos e departamentos das respostas rapidas"
+	},
+	{
+		"id": "e190",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/quick-replies?query={\"attributes\":[\"text\"],\"perPage\":40}",
+		"sourcePath": "Gerais > Respostas rapidas > Listar somente os textos das respostas rapidas"
+	},
+	{
+		"id": "e191",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/quick-replies/{{quickRepliesId}}",
+		"sourcePath": "Gerais > Respostas rapidas > Buscar resposta rapida"
+	},
+	{
+		"id": "e192",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/quick-replies/{{quickRepliesId}}",
+		"sourcePath": "Gerais > Respostas rapidas > Editar resposta rapida"
+	},
+	{
+		"id": "e193",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/quick-replies",
+		"sourcePath": "Gerais > Respostas rapidas > Criar resposta rapida"
+	},
+	{
+		"id": "e194",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/quick-replies/{{quickRepliesId}}",
+		"sourcePath": "Gerais > Respostas rapidas > Excluir resposta rapida"
+	},
+	{
+		"id": "e195",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/bots?perPage=40",
+		"sourcePath": "Gerais > Robos > Listar bots V1 / V2 / V3"
+	},
+	{
+		"id": "e196",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/bots?query={\"where\":{\"settings\":{\"botCreatedVersion\":{\"$or\":[null,\"v1\",\"v2\"]}}},\"order\":[[\"name\",\"ASC\"]],\"page\":1,\"perPage\":40}",
+		"sourcePath": "Gerais > Robos > Listar bots V1 / V2"
+	},
+	{
+		"id": "e197",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/bots?query={\"where\":{\"settings\":{\"botCreatedVersion\":\"v3\"}},\"order\":[[\"name\",\"ASC\"]],\"page\":1,\"perPage\":40}",
+		"sourcePath": "Gerais > Robos > Listar bots V3"
+	},
+	{
+		"id": "e198",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/bots/{{botId}}",
+		"sourcePath": "Gerais > Robos > Buscar bot"
+	},
+	{
+		"id": "e199",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/bots/{{botId}}",
+		"sourcePath": "Gerais > Robos > Editar bot"
+	},
+	{
+		"id": "e200",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/bots/{{botId}}",
+		"sourcePath": "Gerais > Robos > Excluir bot"
+	},
+	{
+		"id": "e201",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tags?perPage=40",
+		"sourcePath": "Gerais > Tags > Listar tags"
+	},
+	{
+		"id": "e202",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tags/{{tagId}}",
+		"sourcePath": "Gerais > Tags > Buscar tag"
+	},
+	{
+		"id": "e203",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}?include[0]=tags&include[1]=",
+		"sourcePath": "Gerais > Tags > Buscar tags vinculadas a um contato"
+	},
+	{
+		"id": "e204",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/tags/{{tagId}}",
+		"sourcePath": "Gerais > Tags > Editar tag"
+	},
+	{
+		"id": "e205",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tags",
+		"sourcePath": "Gerais > Tags > Criar tag"
+	},
+	{
+		"id": "e206",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tags/{{tagId}}/contacts",
+		"sourcePath": "Gerais > Tags > Adicona uma tag a multiplos contatos"
+	},
+	{
+		"id": "e207",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/tags/{{tagId}}/contacts",
+		"sourcePath": "Gerais > Tags > Remove uma tag a multiplos contatos"
+	},
+	{
+		"id": "e208",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/tags/{{tagId}}",
+		"sourcePath": "Gerais > Tags > Excluir tag"
+	},
+	{
+		"id": "e209",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates?perPage=40",
+		"sourcePath": "Gerais > Templates > Listar templates"
+	},
+	{
+		"id": "e210",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/{{templateId}}",
+		"sourcePath": "Gerais > Templates > Buscar template"
+	},
+	{
+		"id": "e211",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/count",
+		"sourcePath": "Gerais > Templates > Total de templates cadastrados"
+	},
+	{
+		"id": "e212",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/{{templateId}}",
+		"sourcePath": "Gerais > Templates > Editar template"
+	},
+	{
+		"id": "e213",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/{{hsmId}}/send-to-review",
+		"sourcePath": "Gerais > Templates > Enviar template para aprovacao"
+	},
+	{
+		"id": "e214",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/refresh-templates",
+		"sourcePath": "Gerais > Templates > Sincronizar templates com o provedor"
+	},
+	{
+		"id": "e215",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Templates > Enviar template com botao"
+	},
+	{
+		"id": "e216",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Templates > Enviar template com URL no botao"
+	},
+	{
+		"id": "e217",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Gerais > Templates > Envio de template com dois parametros"
+	},
+	{
+		"id": "e218",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates",
+		"sourcePath": "Gerais > Templates > Criar template somente com texto"
+	},
+	{
+		"id": "e219",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/whatsapp-business-templates/{{templateId}}",
+		"sourcePath": "Gerais > Templates > Excluir template"
+	},
+	{
+		"id": "e220",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/acceptance-terms?perPage=40",
+		"sourcePath": "Gerais > Termos de aceite > Listar termos de aceite"
+	},
+	{
+		"id": "e221",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/acceptance-terms/{{termsId}}",
+		"sourcePath": "Gerais > Termos de aceite > Buscar termo de aceite"
+	},
+	{
+		"id": "e222",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/acceptance-terms/{{termsId}}",
+		"sourcePath": "Gerais > Termos de aceite > Editar termo de aceite"
+	},
+	{
+		"id": "e223",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/acceptance-terms",
+		"sourcePath": "Gerais > Termos de aceite > Criar termo de aceite"
+	},
+	{
+		"id": "e224",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/acceptance-terms/{{termsId}}",
+		"sourcePath": "Gerais > Termos de aceite > Excluir termo de aceite"
+	},
+	{
+		"id": "e225",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/me/tokens?perPage30=",
+		"sourcePath": "Gerais > Tokens > Listar tokens"
+	},
+	{
+		"id": "e226",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/me/tokens/{{tokenId}}",
+		"sourcePath": "Gerais > Tokens > Buscar token"
+	},
+	{
+		"id": "e227",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/me/tokens/{{tokenId}}",
+		"sourcePath": "Gerais > Tokens > Editar token"
+	},
+	{
+		"id": "e228",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/me/tokens",
+		"sourcePath": "Gerais > Tokens > Criar token"
+	},
+	{
+		"id": "e229",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/me/tokens/{{tokenId}}",
+		"sourcePath": "Gerais > Tokens > Excluir token"
+	},
+	{
+		"id": "e230",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/users?perPage=40",
+		"sourcePath": "Gerais > Usuarios > Listar usuarios"
+	},
+	{
+		"id": "e231",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/users?query={\"include\":[{\"model\":\"departments\",\"attributes\":[\"id\",\"name\"]}],\"page\":1,\"perPage\":15}",
+		"sourcePath": "Gerais > Usuarios > Listar usuarios com seus departamentos"
+	},
+	{
+		"id": "e232",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/users/{{userId}}",
+		"sourcePath": "Gerais > Usuarios > Buscar usuario"
+	},
+	{
+		"id": "e233",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/users/{{userId}}",
+		"sourcePath": "Gerais > Usuarios > Editar usuario"
+	},
+	{
+		"id": "e234",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/users",
+		"sourcePath": "Gerais > Usuarios > Criar usuario"
+	},
+	{
+		"id": "e235",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/users/{{userId}}/archive",
+		"sourcePath": "Gerais > Usuarios > Arquiva usuario"
+	},
+	{
+		"id": "e236",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/versions",
+		"sourcePath": "Gerais > Versoes > Versao da plataforma"
+	},
+	{
+		"id": "e237",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/me/webhooks?perPage=40",
+		"sourcePath": "Gerais > Webhooks > Listar webhooks"
+	},
+	{
+		"id": "e238",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/me/webhooks/{{webhookId}}",
+		"sourcePath": "Gerais > Webhooks > Buscar webhook"
+	},
+	{
+		"id": "e239",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/me/webhooks/{{webhookId}}",
+		"sourcePath": "Gerais > Webhooks > Editar webhook"
+	},
+	{
+		"id": "e240",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/me/webhooks",
+		"sourcePath": "Gerais > Webhooks > Criar webhook"
+	},
+	{
+		"id": "e241",
+		"method": "POST",
+		"rawUrl": "{{link_Completo_Webhook}}",
+		"sourcePath": "Gerais > Webhooks > Teste Webhook"
+	},
+	{
+		"id": "e242",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/exists?numbers[]={{contactNumber}}&serviceId={{serviceId}}",
+		"sourcePath": "Gerais > WhatsApp > Validacao WhatsApp"
+	},
+	{
+		"id": "e243",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/departments-resume",
+		"sourcePath": "Populares > Agora > Buscar departamentos (Agora)"
+	},
+	{
+		"id": "e244",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/attendance-resume",
+		"sourcePath": "Populares > Agora > Buscar atendentes (Agora)"
+	},
+	{
+		"id": "e245",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/now/resume",
+		"sourcePath": "Populares > Agora > Buscar todos os dados (Agora)"
+	},
+	{
+		"id": "e246",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/oauth/token",
+		"sourcePath": "Populares > Autorizacao > Gerar Token de acesso"
+	},
+	{
+		"id": "e247",
+		"method": "GET",
+		"rawUrl": "{{URL}}/tickets?where[contactId]={{contactId}}",
+		"sourcePath": "Populares > Chamados > Buscar chamados do contato"
+	},
+	{
+		"id": "e248",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"where\":{\"contactId\":\"{{contactId}}\"},\"attributes\":[\"id\",\"isOpen\",\"protocol\",\"origin\",\"startedAt\",\"endedAt\"],\"include\":[{\"model\":\"ticketTransfers\",\"attributes\":[\"action\",\"fromDistribution\"],\"include\":[{\"model\":\"byUser\",\"attributes\":[\"id\",\"name\",\"email\",\"status\"]}]}],\"perPage\":50}",
+		"sourcePath": "Populares > Chamados > Buscar pelo contactid todos os chamados do cliente trazendo quem encerrou/transferiu"
+	},
+	{
+		"id": "e249",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1//contacts/{{contactId}}/ticket/transfer",
+		"sourcePath": "Populares > Chamados > Transferencia de chamado"
+	},
+	{
+		"id": "e250",
+		"method": "POST",
+		"rawUrl": "{{URL}}/contacts/{{contactId}}/ticket/transfer",
+		"sourcePath": "Populares > Chamados > Abertura de chamado"
+	},
+	{
+		"id": "e251",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/close",
+		"sourcePath": "Populares > Chamados > Fechar chamado"
+	},
+	{
+		"id": "e252",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/ticket/close",
+		"sourcePath": "Populares > Chamados > Fechar um chamado com assunto"
+	},
+	{
+		"id": "e253",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?perPage=40",
+		"sourcePath": "Populares > Contatos > Listar todos os contatos"
+	},
+	{
+		"id": "e254",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?where[serviceId]={{serviceId}}?perPage=40",
+		"sourcePath": "Populares > Contatos > Listar contatos da conexao"
+	},
+	{
+		"id": "e255",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Buscar contato"
+	},
+	{
+		"id": "e256",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?where[data.number][$iLike]=%{{number}}%&where[serviceId]={{serviceId}}",
+		"sourcePath": "Populares > Contatos > Buscar contato por numero de uma conexao especifica"
+	},
+	{
+		"id": "e257",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}?include[0]=tags&include[1]=",
+		"sourcePath": "Populares > Contatos > Buscar tags vinculadas a um contato"
+	},
+	{
+		"id": "e258",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"customFieldValues\",\"include\":[{\"model\":\"customField\",\"where\":{\"name\":\"{{customFieldName}}\"}}]}]}",
+		"sourcePath": "Populares > Contatos > Buscar contatos que possuem campo personalizado especifico"
+	},
+	{
+		"id": "e259",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}?query={\"include\":[{\"model\":\"customFieldValues\",\"include\":[{\"model\":\"customField\",\"where\":{\"name\":\"{{customFieldName}}\"}}]}]}",
+		"sourcePath": "Populares > Contatos > Buscar campos personalizados de um contato especifico"
+	},
+	{
+		"id": "e260",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts?query={\"include\":[{\"model\":\"customFieldValues\",\"include\":[{\"model\":\"customField\",\"where\":{\"$or\":[{\"name\":\"{{customFieldName1}}\"},{\"name\":\"{{customFieldName2}}\"},{\"name\":\"{{customFieldName3}}\"},{\"name\":\"{{customFieldName4}}\"}]}}]}]}",
+		"sourcePath": "Populares > Contatos > Busca de contatos que possuem X campos personalizados preenchidos"
+	},
+	{
+		"id": "e261",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/contacts/exists?numbers[]={{phoneNumber}}&serviceId={{serviceId}}",
+		"sourcePath": "Populares > Contatos > Verifica a existencia de um contato"
+	},
+	{
+		"id": "e262",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Editar contato"
+	},
+	{
+		"id": "e263",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Editar tag do contato"
+	},
+	{
+		"id": "e264",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Editar campo personalizado de um contato"
+	},
+	{
+		"id": "e265",
+		"method": "PUT",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Incluir tags em um contato existente Copy"
+	},
+	{
+		"id": "e266",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts",
+		"sourcePath": "Populares > Contatos > Cadastrar contato"
+	},
+	{
+		"id": "e267",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/many",
+		"sourcePath": "Populares > Contatos > Cadastrar multiplos contatos"
+	},
+	{
+		"id": "e268",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/export/csv",
+		"sourcePath": "Populares > Contatos > Exportar contatos"
+	},
+	{
+		"id": "e269",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/count",
+		"sourcePath": "Populares > Contatos > Total de contatos com filtros"
+	},
+	{
+		"id": "e270",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/sync",
+		"sourcePath": "Populares > Contatos > Sincroniza contato"
+	},
+	{
+		"id": "e271",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/block",
+		"sourcePath": "Populares > Contatos > Bloquear contato"
+	},
+	{
+		"id": "e272",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}/block",
+		"sourcePath": "Populares > Contatos > Desbloquear contato"
+	},
+	{
+		"id": "e273",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/contacts/{{contactId}}",
+		"sourcePath": "Populares > Contatos > Excluir contato"
+	},
+	{
+		"id": "e274",
+		"method": "DELETE",
+		"rawUrl": "{{URL}}/api/v1/contacts/many",
+		"sourcePath": "Populares > Contatos > Exclui multiplos contatos"
+	},
+	{
+		"id": "e275",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-01-01T23:59:59.999Z}}&endPeriod={{2023-01-02T23:59:59.999Z}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas por periodo"
+	},
+	{
+		"id": "e276",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&serviceId={{serviceId}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas pela conexao"
+	},
+	{
+		"id": "e277",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas por departamento"
+	},
+	{
+		"id": "e278",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&userId={{userId}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas por usuario"
+	},
+	{
+		"id": "e279",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}&userId={{userId}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas por departamento + usuario"
+	},
+	{
+		"id": "e280",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&status={{all/open/close}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas pelo status dos chamados"
+	},
+	{
+		"id": "e281",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/dashboard/general?startPeriod={{2024-07-01T23:59:59.999Z}}&endPeriod={{2024-07-30T23:59:59.999Z}}&grouping=&departmentId={{departmentId}}&userId={{userId}}&periodType={{open/close}}Date&departmentParticipation={{last/middle}}&userParticipation={{last/middle}}&status={{all/open/close}}&serviceId={{serviceId}}",
+		"sourcePath": "Populares > Estatisticas de atendimento > Buscar estatisticas com todos os filtros ativos"
+	},
+	{
+		"id": "e282",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets/{{ticketId}}?include[0][model]=contact&include[0][include][0]=avatar&include[0][include][1]=thumbAvatar&include[1]=department&include[2]=user&include[3]=ticketTopics",
+		"sourcePath": "Populares > Historico de chamados > Buscar por um chamado especifico"
+	},
+	{
+		"id": "e283",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?startPeriod={{2024-01-01T23:59:59.999Z}}&endPeriod={{2023-01-02T23:59:59.999Z}}",
+		"sourcePath": "Populares > Historico de chamados > Buscar chamados por periodo"
+	},
+	{
+		"id": "e284",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":true},\"include\":[{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Populares > Historico de chamados > Buscar chamados abertos por conexao"
+	},
+	{
+		"id": "e285",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":false},\"include\":[{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Populares > Historico de chamados > Buscar chamados fechados por conexao"
+	},
+	{
+		"id": "e286",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{\"isOpen\":{\"$in\":[true,false]}},\"include\":[{\"model\":\"contact\",\"attributes\":[\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true,\"serviceId\":\"{{serviceId}}\"},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true}]}],\"page\":1,\"perPage\":20}",
+		"sourcePath": "Populares > Historico de chamados > Buscar chamados abertos + fechados por conexao"
+	},
+	{
+		"id": "e287",
+		"method": "GET",
+		"rawUrl": "{{URL}}/api/v1/tickets?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{},\"include\":[{\"model\":\"account\"},{\"model\":\"firstMessage\",\"attributes\":[\"id\",\"type\",\"text\",\"timestamp\",\"isFromMe\",\"sent\",\"data\",\"accountId\",\"serviceId\",\"contactId\",\"fromId\",\"toId\",\"userId\",\"ticketId\",\"isFromBot\",\"isFromSync\",\"visible\",\"ticketUserId\",\"ticketDepartmentId\",\"origin\",\"botId\",\"campaignId\"]},{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true},{\"model\":\"tags\",\"attributes\":[\"id\",\"label\",\"accountId\"]},{\"model\":\"person\",\"attributes\":[\"id\",\"name\",\"document\",\"accountId\"]},{\"model\":\"thumbAvatar\"}]},{\"model\":\"user\",\"attributes\":[\"id\",\"name\",\"email\",\"isSuperAdmin\",\"active\",\"accountId\",\"isFirstLogin\",\"status\",\"timetableId\",\"archivedAt\",\"phoneNumber\",\"data\",\"language\",\"isActiveInternalChat\"]},{\"model\":\"department\",\"attributes\":[\"id\",\"name\",\"accountId\",\"archivedAt\",\"distributionId\"]},{\"model\":\"ticketTopics\",\"attributes\":[\"id\",\"name\",\"archivedAt\"]}]}&perPage=30",
+		"sourcePath": "Populares > Historico de chamados > Buscar todos os chamados da plataforma"
+	},
+	{
+		"id": "e288",
+		"method": "GET",
+		"rawUrl": "{{URLbase}}/pdf/tickets/{{ticketId}}/pt-BR?pdf=1&lng=pt-BR",
+		"sourcePath": "Populares > Historico de chamados > Exportar historico de chamados em PDF"
+	},
+	{
+		"id": "e289",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tickets/export",
+		"sourcePath": "Populares > Historico de chamados > Exportar historico de chamados em TXT"
+	},
+	{
+		"id": "e290",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/tickets/export-history?query={\"distinct\":true,\"order\":[[\"updatedAt\",\"DESC\"]],\"where\":{},\"include\":[{\"model\":\"firstMessage\",\"attributes\":[\"id\",\"type\",\"text\",\"timestamp\",\"isFromMe\",\"sent\",\"data\",\"accountId\",\"serviceId\",\"contactId\",\"fromId\",\"toId\",\"userId\",\"ticketId\",\"isFromBot\",\"isFromSync\",\"visible\",\"ticketUserId\",\"ticketDepartmentId\",\"origin\",\"botId\",\"campaignId\"]},{\"model\":\"contact\",\"attributes\":[\"id\",\"accountId\",\"name\",\"alternativeName\",\"internalName\",\"serviceId\",\"data\",\"note\",\"personId\",\"status\"],\"required\":true,\"where\":{\"visible\":true},\"include\":[{\"model\":\"service\",\"attributes\":[\"id\",\"name\",\"type\",\"accountId\",\"botId\",\"archivedAt\"],\"required\":true},{\"model\":\"tags\",\"attributes\":[\"id\",\"label\",\"accountId\"]},{\"model\":\"person\",\"attributes\":[\"id\",\"name\",\"document\",\"accountId\"]}]},{\"model\":\"user\",\"attributes\":[\"id\",\"name\",\"email\",\"isSuperAdmin\",\"active\",\"accountId\",\"isFirstLogin\",\"status\",\"timetableId\",\"archivedAt\",\"phoneNumber\",\"data\",\"language\",\"isActiveInternalChat\"]},{\"model\":\"department\",\"attributes\":[\"id\",\"name\",\"accountId\",\"archivedAt\",\"distributionId\"]},{\"model\":\"ticketTopics\",\"attributes\":[\"id\",\"name\",\"archivedAt\"]}]}",
+		"sourcePath": "Populares > Historico de chamados > Exportar historico de chamados em CSV"
+	},
+	{
+		"id": "e291",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar mensagem"
+	},
+	{
+		"id": "e292",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar mensagem SEM abrir o chamado"
+	},
+	{
+		"id": "e293",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar comentario"
+	},
+	{
+		"id": "e294",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar de mensagem usando bot e sem abrir chamado"
+	},
+	{
+		"id": "e295",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar imagem"
+	},
+	{
+		"id": "e296",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar PDF"
+	},
+	{
+		"id": "e297",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar comentario"
+	},
+	{
+		"id": "e298",
+		"method": "POST",
+		"rawUrl": "{{URL}}/api/v1/messages",
+		"sourcePath": "Populares > Mensagens > Enviar audio"
+	}
+]
