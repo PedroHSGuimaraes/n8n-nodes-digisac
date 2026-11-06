@@ -84,6 +84,9 @@ describe('IDs guiados na versão 2', () => {
 				['list', 'id'],
 				nome,
 			);
+			// O método de busca tem de ser o do tipo do campo (departmentId não pode apontar para usuários).
+			const tipo = padrao.exec(nome)[1] + 'Id';
+			assert.equal(campo.modes[0].typeOptions.searchListMethod, TIPOS_COM_LISTA[tipo], nome);
 		}
 		// Chaves de ID dentro dos Campos do Body (coleções bodyFields_<op>_fields).
 		const idsDoBody = /^(contactId|userId|serviceId|departmentId)$/;
@@ -98,6 +101,11 @@ describe('IDs guiados na versão 2', () => {
 			comId += 1;
 			for (const filho of filhosId) {
 				assert.equal(filho.type, 'resourceLocator', `${nome}.${filho.name}`);
+				assert.equal(
+					filho.modes[0].typeOptions.searchListMethod,
+					TIPOS_COM_LISTA[filho.name],
+					`${nome}.${filho.name}`,
+				);
 			}
 		}
 		assert.equal(comId, 38, 'o catálogo tem 38 coleções de body com ID');
@@ -149,6 +157,35 @@ describe('IDs guiados na versão 2', () => {
 			queryKey_e100_departmentId: { mode: 'id', value: 'all' },
 		});
 		assert.equal(req.qs.departmentId, 'all');
+	});
+
+	it('S3.14 ID de path em texto na v2 perde o espaço e número vale', async () => {
+		const comEspaco = await executarV2({ path_e001_contactId: ' c1 ', path_e001_botId: 'b1' });
+		assert.equal(comEspaco.url, '/api/v1/bots/b1/trigger-signal/c1');
+		const numero = await executarV2({ path_e001_contactId: 123, path_e001_botId: 'b1' });
+		assert.equal(numero.url, '/api/v1/bots/b1/trigger-signal/123');
+	});
+
+	it('S3.15 cópias da v2 ficam invisíveis na v1', () => {
+		// Agrupa por nome + onde aparece (sem @version): cada grupo com cópia por versão tem 1 por versão.
+		const grupos = new Map();
+		for (const p of propriedades) {
+			const { '@version': _versao, ...onde } = p.displayOptions?.show ?? {};
+			const chave = `${p.name}|${JSON.stringify(onde)}`;
+			grupos.set(chave, [...(grupos.get(chave) ?? []), p]);
+		}
+		const visivelNaV1 = (p) => {
+			const cond = p.displayOptions?.show?.['@version'];
+			return cond === undefined || cond.includes(1);
+		};
+		let pares = 0;
+		for (const [chave, lista] of grupos) {
+			if (!lista.some((p) => p.displayOptions?.show?.['@version'])) continue;
+			pares += 1;
+			assert.equal(lista.filter(visivelNaV1).length, 1, `${chave}: deve ter 1 cópia na v1`);
+			assert.equal(lista.filter(visivelNaV2).length, 1, `${chave}: deve ter 1 cópia na v2`);
+		}
+		assert.ok(pares > 250, `esperava mais de 250 pares, achou ${pares}`);
 	});
 
 	it('S3.11 v2 aceita texto de workflow migrado à mão', async () => {
@@ -223,6 +260,11 @@ describe('listSearch dos IDs', () => {
 
 		const curta = await buscar('searchTags', undefined, undefined, () => ({ data: itens(12) }));
 		assert.equal(curta.resultado.paginationToken, undefined);
+		// Um item a menos que a página cheia é a última página: sem token.
+		const quaseCheia = await buscar('searchTags', undefined, undefined, () => ({
+			data: itens(49),
+		}));
+		assert.equal(quaseCheia.resultado.paginationToken, undefined);
 
 		const segunda = await buscar('searchTags', undefined, '2', () => ({ data: itens(50) }));
 		assert.equal(segunda.requisicoes[0].qs.page, 2);
@@ -238,5 +280,23 @@ describe('listSearch dos IDs', () => {
 			assert.equal(String(erro.httpCode), '401');
 			return true;
 		});
+	});
+	it('S3.12 busca de contato limpa o + e escapa % e _', async () => {
+		const resposta = () => ({ data: [] });
+		const telefone = await buscar('searchContacts', '+55 (11) 9999-8888', undefined, resposta);
+		// O + e a pontuação saem: o número guardado no Digisac não os tem.
+		assert.equal(telefone.requisicoes[0].qs['where[data.number][$iLike]'], '%551199998888%');
+		const misto = await buscar('searchContacts', 'ana 5511', undefined, resposta);
+		assert.equal(misto.requisicoes[0].qs['where[name][$iLike]'], '%ana 5511%');
+		// % e _ do usuário são texto, não curinga do ILIKE.
+		const curinga = await buscar('searchContacts', '100%_x', undefined, resposta);
+		assert.equal(curinga.requisicoes[0].qs['where[name][$iLike]'], '%100\\%\\_x%');
+	});
+
+	it('S3.13 página cheia sem acerto no filtro do node ainda devolve token', async () => {
+		// Limite aceito (plano, Assumptions): o filtro vale para a página baixada; a pessoa rola para a próxima.
+		const { resultado } = await buscar('searchTags', 'zzz', undefined, () => ({ data: itens(50) }));
+		assert.deepEqual(resultado.results, []);
+		assert.equal(resultado.paginationToken, '2');
 	});
 });

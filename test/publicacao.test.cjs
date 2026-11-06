@@ -2,7 +2,9 @@
 // Eles guardam o que o dono pediu: README no padrão completo, funding, CHANGELOG,
 // geração de documentos que não apaga o README e publicação por stage com aprovação por 2FA.
 const assert = require('node:assert/strict');
-const { readFileSync } = require('node:fs');
+const { execFileSync } = require('node:child_process');
+const { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } = require('node:fs');
+const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { describe, it } = require('node:test');
 
@@ -74,6 +76,25 @@ describe('documentação e lançamento', () => {
 		assert.throws(() => substituirBloco('# sem marcadores\n', 'novo'), /marcador/i);
 		// O README real tem os marcadores.
 		assert.ok(ler('README.md').includes(MARCADOR_INICIO));
+	});
+
+	it('S5.03b generate:docs roda sem apagar o texto manual do README', () => {
+		// Copia o catálogo e um README de teste para uma pasta temporária e roda o script de verdade.
+		const tmp = mkdtempSync(path.join(tmpdir(), 'digisac-docs-'));
+		mkdirSync(path.join(tmp, 'nodes', 'Digisac', 'generated'), { recursive: true });
+		copyFileSync(
+			path.join(raiz, 'nodes', 'Digisac', 'generated', 'endpoints.ts'),
+			path.join(tmp, 'nodes', 'Digisac', 'generated', 'endpoints.ts'),
+		);
+		const manual =
+			'# Meu README\n\ntexto manual\n\n<!-- digisac:recursos:start -->\nvelho\n<!-- digisac:recursos:end -->\n\nrodapé manual\n';
+		writeFileSync(path.join(tmp, 'README.md'), manual);
+		execFileSync('node', [path.join(raiz, 'scripts', 'generate-docs.mjs')], { cwd: tmp });
+		const depois = readFileSync(path.join(tmp, 'README.md'), 'utf8');
+		assert.ok(depois.startsWith('# Meu README\n\ntexto manual\n'));
+		assert.ok(depois.endsWith('\nrodapé manual\n'));
+		assert.ok(!depois.includes('velho'));
+		assert.match(depois, /\| Contatos \(General\) \| 22 \|/);
 	});
 
 	it('S5.04 publish.yml usa o stage do npm 12.2.2 com provenance', () => {

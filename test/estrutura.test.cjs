@@ -19,7 +19,11 @@ describe('toolchain do node-cli', () => {
 			'dist/nodes/Digisac/Digisac.node.js',
 			'dist/credentials/DigisacApi.credentials.js',
 			'dist/nodes/Digisac/digisac.svg',
+			'dist/nodes/Digisac/digisac.png',
+			'dist/nodes/Digisac/digisac.dark.png',
 			'dist/credentials/digisac.svg',
+			'dist/credentials/digisac.png',
+			'dist/credentials/digisac.dark.png',
 		]) {
 			assert.ok(existsSync(path.join(raiz, arquivo)), `faltou ${arquivo}`);
 		}

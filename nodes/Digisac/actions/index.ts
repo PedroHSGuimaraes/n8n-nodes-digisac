@@ -822,16 +822,15 @@ function buildSimpleQueryValue(
 	i: number,
 	entry: QueryEntry,
 ): string | undefined {
-	// O campo pode ser texto (versão 1) ou Resource Locator (versão 2); plainValue entrega sempre texto.
-	const configuredValue = plainValue(node.getNodeParameter(entry.field, i, queryDefault(entry)));
-	if (configuredValue === '') return undefined;
-
-	// Na versão 2 o seletor de data entrega um texto de data; a API recebe o ISO em UTC.
+	// O campo pode ser texto (versão 1), Resource Locator ou data (versão 2).
+	const rawValue = node.getNodeParameter(entry.field, i, queryDefault(entry));
+	// Na versão 2 o seletor de data entrega texto, Date ou DateTime; a API recebe ISO em UTC.
 	// Na versão 1 o texto segue como a pessoa digitou (igual à 1.0.3).
-	const value =
-		node.getNode().typeVersion >= 2 && isDateQueryKey(entry.key)
-			? toIsoDate(node, configuredValue, entry.displayName, i)
-			: configuredValue;
+	const isGuidedDate = node.getNode().typeVersion >= 2 && isDateQueryKey(entry.key);
+	const value = isGuidedDate
+		? toIsoDate(node, rawValue, entry.displayName, i)
+		: plainValue(rawValue);
+	if (value === '') return undefined;
 
 	if (entry.variables.length === 1) {
 		return replaceTemplateValues(entry.value, { [entry.variables[0]]: value });

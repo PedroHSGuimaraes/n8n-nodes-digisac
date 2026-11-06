@@ -57,6 +57,39 @@ describe('datas na versão 2', () => {
 		);
 	});
 
+	it('S4.08 datas estritas: lixo e dia inexistente falham, Date e sem fuso valem', async () => {
+		for (const ruim of ['5', '2026', '2026-02-30', '2026-13-01']) {
+			await assert.rejects(
+				executar(2, { operation: 'e101', queryKey_e101_startPeriod: ruim }),
+				/is not a valid date/,
+				ruim,
+			);
+		}
+		// Sem fuso o valor é lido como UTC, igual em qualquer servidor.
+		const semFuso = await executar(2, {
+			operation: 'e101',
+			queryKey_e101_startPeriod: '2026-01-01T00:00:00',
+		});
+		assert.equal(semFuso.qs.startPeriod, '2026-01-01T00:00:00.000Z');
+		const soData = await executar(2, {
+			operation: 'e101',
+			queryKey_e101_startPeriod: '2026-01-31',
+		});
+		assert.equal(soData.qs.startPeriod, '2026-01-31T00:00:00.000Z');
+		// Objeto Date vindo de expressão ($now) não pode sumir calado.
+		const objeto = await executar(2, {
+			operation: 'e101',
+			queryKey_e101_startPeriod: new Date('2026-03-05T10:00:00.000Z'),
+		});
+		assert.equal(objeto.qs.startPeriod, '2026-03-05T10:00:00.000Z');
+		// DateTime do Luxon tem toISO().
+		const luxon = await executar(2, {
+			operation: 'e101',
+			queryKey_e101_startPeriod: { toISO: () => '2026-03-05T10:00:00.000-03:00' },
+		});
+		assert.equal(luxon.qs.startPeriod, '2026-03-05T13:00:00.000Z');
+	});
+
 	it('S4.07 v1 envia a data em texto sem conversão', async () => {
 		const req = await executar(1, {
 			operation: 'e101',
@@ -114,6 +147,12 @@ describe('valores fixos na versão 2', () => {
 		});
 		assert.equal(req.qs.type, 'nps');
 		assert.equal(req.qs.periodType, 'open');
+	});
+
+	it('S4.09 periodType open sai como openDate onde a documentação cola Date', async () => {
+		// e109 documenta periodType={{open/close}}Date: a opção "open" vira "openDate" na rede.
+		const req = await executar(2, { operation: 'e109', queryKey_e109_periodType: 'open' });
+		assert.equal(req.qs.periodType, 'openDate');
 	});
 
 	it('S4.06 origin do body vira options na v2 e continua texto na v1', () => {

@@ -204,7 +204,13 @@ export function getIdParameter(
 	itemIndex: number,
 ): string {
 	const raw = node.getNodeParameter(name, itemIndex, '') as unknown;
-	if (typeof raw !== 'object' || raw === null) return typeof raw === 'string' ? raw : '';
+	if (typeof raw !== 'object' || raw === null) {
+		// Número (ex.: vindo de expressão) vale como ID, igual à 1.0.3, que o convertia em texto.
+		if (typeof raw === 'number') return String(raw);
+		if (typeof raw !== 'string') return '';
+		// Versão 1 mantém o texto como a 1.0.3; da versão 2 em diante o espaço das pontas sai.
+		return node.getNode().typeVersion >= 2 ? raw.trim() : raw;
+	}
 
 	const value = plainValue(raw);
 	if (value) return value;

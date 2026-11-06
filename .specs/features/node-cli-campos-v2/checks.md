@@ -6,7 +6,7 @@ Plan: `.specs/features/node-cli-campos-v2/plan.md`
 
 ## Intent
 
-34 checks in 5 slices · 5 one-way doors · 0 open, 0 block
+44 checks in 5 slices · 5 one-way doors · 0 open, 0 block
 
 ## Checks
 
@@ -88,6 +88,18 @@ Proof: run unit | ✔ S3.08 listas dos 7 tipos
 **C24** - A página cheia (50) devolve `paginationToken` com a próxima página, a página curta não, e nenhuma chamada baixa tudo (S3 AC 9)
 Proof: run unit | ✔ S3.09 paginação
 
+**C39** - A busca de contato limpa o `+` e a pontuação do número e escapa `%` e `_` do nome (S3 AC 7)
+Proof: run unit | ✔ S3.12 busca de contato limpa
+
+**C40** - Página cheia sem acerto no filtro do node devolve o token da próxima página (S3 AC 8, AC 9)
+Proof: run unit | ✔ S3.13 página cheia sem acerto
+
+**C41** - ID de path em texto na v2 perde o espaço das pontas e número vale como ID (S3 AC 11)
+Proof: run unit | ✔ S3.14 ID de path em texto
+
+**C42** - Toda cópia da versão 2 fica invisível na versão 1, uma cópia por versão (S3 AC 2, S2 AC 3)
+Proof: run unit | ✔ S3.15 cópias da v2
+
 **C25** - O `401` do Digisac na lista vira `NodeApiError` com o código `401` (S3 AC 10)
 Proof: run unit | ✔ S3.10 401 na lista
 
@@ -113,6 +125,12 @@ Proof: run unit | ✔ S4.05 options saem na query
 
 **C32** - `origin` do body de mensagem vira `options` `bot`/`user` na versão 2 e continua texto na 1 (S4 AC 6)
 Proof: run unit | ✔ S4.06 origin vira options
+
+**C43** - Data inválida (`5`, `2026`, `2026-02-30`) falha; `Date`, Luxon e texto sem fuso valem, este como UTC (S4 AC 2, AC 3)
+Proof: run unit | ✔ S4.08 datas estritas
+
+**C44** - `periodType` `open` sai como `openDate` em e109 (S4 AC 5)
+Proof: run unit | ✔ S4.09 periodType open
 
 **C33** - A versão 1 envia a data em texto sem conversão (S4 AC 7)
 Proof: run unit | ✔ S4.07 v1 envia a data

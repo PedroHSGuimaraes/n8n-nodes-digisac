@@ -81,18 +81,60 @@ export function guideBodyChild(child: INodeProperties): INodeProperties | undefi
 }
 
 /**
+ * Formato aceito: data ISO 8601 (`2026-01-31`) com hora e fuso opcionais.
+ * Grupos: ano, mês, dia, hora, minuto, segundo, fração, fuso.
+ */
+const ISO_DATE =
+	/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,9}))?)?)?(Z|[+-]\d{2}:?\d{2})?$/;
+
+/**
+ * Lê o valor de um campo de data como texto ISO, venha ele como texto, `Date` (expressão `$now`)
+ * ou DateTime do Luxon (tem `toISO()`). Outro tipo vira texto vazio.
+ */
+function dateAsText(raw: unknown): string {
+	if (raw instanceof Date) return Number.isNaN(raw.getTime()) ? 'invalid' : raw.toISOString();
+	if (typeof raw === 'string') return raw.trim();
+	if (
+		typeof raw === 'object' &&
+		raw !== null &&
+		typeof (raw as { toISO?: unknown }).toISO === 'function'
+	) {
+		return String((raw as { toISO: () => string | null }).toISO() ?? 'invalid');
+	}
+	return '';
+}
+
+/**
  * Converte o valor do seletor de data para ISO em UTC, que é o formato que a coleção usa.
- * Valor vazio volta vazio (o campo é opcional). Valor que não é data lança erro claro.
+ * Valor vazio volta vazio (o campo é opcional). Texto sem fuso é lido como UTC, para o resultado
+ * não depender do fuso do servidor. Valor que não é data (`5`, `2026`, `2026-02-30`) lança erro claro.
  */
 export function toIsoDate(
 	node: IExecuteFunctions,
-	raw: string,
+	raw: unknown,
 	displayName: string,
 	itemIndex: number,
 ): string {
-	if (raw === '') return raw;
-	const date = new Date(raw);
-	if (Number.isNaN(date.getTime())) {
+	const text = dateAsText(raw);
+	if (text === '') return '';
+
+	const parts = ISO_DATE.exec(text);
+	let date: Date | undefined;
+	if (parts) {
+		const [year, month, day, hour = '0', minute = '0', second = '0', fraction = '0', zone] =
+			parts.slice(1);
+		const millis = Number(fraction.padEnd(3, '0').slice(0, 3));
+		const utc = Date.UTC(+year, +month - 1, +day, +hour, +minute, +second, millis);
+		const built = new Date(utc);
+		// Dia que "estoura" (30 de fevereiro) volta como outro dia: tratamos como inválido.
+		const rolled = built.getUTCMonth() !== +month - 1 || built.getUTCDate() !== +day || +hour > 23;
+		if (!rolled) {
+			// Fuso explícito desloca o instante; sem fuso fica em UTC.
+			const offset = zone && zone !== 'Z' ? offsetMinutes(zone) : 0;
+			date = new Date(utc - offset * 60000);
+		}
+	}
+	if (!date || Number.isNaN(date.getTime())) {
 		throw new NodeOperationError(
 			node.getNode(),
 			`The '${displayName}' parameter is not a valid date [item ${itemIndex}]`,
@@ -103,6 +145,13 @@ export function toIsoDate(
 		);
 	}
 	return date.toISOString();
+}
+
+/** Converte `-03:00` ou `+0530` em minutos de deslocamento em relação ao UTC. */
+function offsetMinutes(zone: string): number {
+	const sign = zone.startsWith('-') ? -1 : 1;
+	const digits = zone.slice(1).replace(':', '');
+	return sign * (Number(digits.slice(0, 2)) * 60 + Number(digits.slice(2)));
 }
 
 /** Diz se a chave de query é um campo de data guiado na versão 2. */

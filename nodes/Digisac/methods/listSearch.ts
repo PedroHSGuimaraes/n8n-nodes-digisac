@@ -86,11 +86,19 @@ function pagedSearch(endpoint: string, serverFilter?: (text: string) => IDataObj
 	};
 }
 
-/** Filtro de contatos: número usa o campo documentado; letras usam o nome. */
+/** Escapa \, % e _ para o ILIKE tratar o texto da pessoa como texto, não como curinga. */
+function escapeLike(text: string): string {
+	return text.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+/**
+ * Filtro de contatos: número usa o campo documentado; letras usam o nome.
+ * No número, o `+` e a pontuação saem, porque o Digisac guarda só os dígitos.
+ */
 function contactFilter(text: string): IDataObject {
 	return looksLikePhone(text)
-		? { 'where[data.number][$iLike]': `%${text.replace(/[\s()-]/g, '')}%` }
-		: { 'where[name][$iLike]': `%${text}%` };
+		? { 'where[data.number][$iLike]': `%${text.replace(/\D/g, '')}%` }
+		: { 'where[name][$iLike]': `%${escapeLike(text)}%` };
 }
 
 export const listSearch = {
