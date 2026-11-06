@@ -62,6 +62,37 @@ describe('documentação e lançamento', () => {
 		assert.doesNotMatch(readme, /^##\s+(?:\S+\s+)?Trigger/m);
 	});
 
+	// Regra protegida (achado F2 do revisor): o padrão do RD Station exige, na seção de Tool de IA, o passo a
+	// passo de ligar a tool, a assinatura do `$fromAI`, exemplos com campos reais do node e as referências.
+	// Se o texto sair da seção, o teste falha e a documentação deixa de explicar como usar o node como tool.
+	it('S5.07 README ensina a usar o node como Tool de IA, com campos reais', () => {
+		const readme = ler('README.md');
+		const inicio = readme.search(/^##\s+(?:\S+\s+)?Usar como Tool de Agente de IA/m);
+		assert.notEqual(inicio, -1, 'falta a seção de Tool de IA');
+		// A seção vai até o próximo título de nível 2.
+		const resto = readme.slice(inicio + 3);
+		const fim = resto.search(/^## /m);
+		const secao = resto.slice(0, fim === -1 ? undefined : fim);
+		for (const trecho of [
+			/^###\s+Como ligar/m,
+			/N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true/,
+			/AI Agent/,
+			/\$fromAI\(key, description\?, type\?, defaultValue\?\)/,
+			/Let the model define this parameter/,
+			/By ID/,
+			/\$fromAI\('text'/,
+			/\$fromAI\('contactId'/,
+			/\$fromAI\('startPeriod'/,
+			/^###\s+Boas práticas/m,
+			/^###\s+Referências/m,
+			/https:\/\/docs\.n8n\.io\//,
+		]) {
+			assert.match(secao, trecho, `a seção de Tool de IA perdeu ${trecho}`);
+		}
+		// Campo que não existe no node não serve de exemplo: `messageText` não é campo do Digisac.
+		assert.doesNotMatch(secao, /messageText/);
+	});
+
 	it('S5.03 generate:docs troca só o bloco entre marcadores', async () => {
 		const { substituirBloco, MARCADOR_INICIO, MARCADOR_FIM } = await import(
 			'../scripts/readme-bloco.mjs'

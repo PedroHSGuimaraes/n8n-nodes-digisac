@@ -21,7 +21,12 @@ import type {
 
 import { digisacApiRequest } from '../transport';
 
-/** Itens por página. 50 é o `perPage` que a coleção usa em `/api/v1/services` e cabe no seletor. */
+/**
+ * Itens por página. A coleção usa `perPage=35` e `40` nos GET simples e 50 só dentro do `query` JSON de
+ * `/api/v1/services`; o `page` simples e o filtro `where[name][$iLike]` não aparecem nela. Tudo isto segue
+ * como suposição (Assumptions do plano, Confirmed? n): se o Digisac limitar abaixo de 50, a lista para na
+ * primeira página.
+ */
 const PAGE_SIZE = 50;
 
 /** Tira acento e caixa para "tecnico" achar "Técnico". */

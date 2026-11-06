@@ -6,7 +6,7 @@ Plan: `.specs/features/node-cli-campos-v2/plan.md`
 
 ## Intent
 
-44 checks in 5 slices · 5 one-way doors · 0 open, 0 block
+47 checks in 5 slices · 5 one-way doors · 0 open, 0 block
 
 ## Checks
 
@@ -55,6 +55,12 @@ Proof: run unit | ✔ S2.03 v1 mantém name e type
 
 **C14** - `Response Format` `Text` devolve `{ data: <texto> }` (S2 AC 4)
 Proof: run unit | ✔ S2.04 formato texto
+
+**C45** - A versão 1 envia número e booleano de campo de query como texto (`5` sai `'5'`, `0` sai `'0'`, `true` sai `'true'`), como a 1.0.3 (S2 AC 1)
+Proof: run unit | ✔ S2.05 v1 envia número e booleano
+
+**C46** - A versão 1 aceita booleano em ID de path e o envia na rota, como a 1.0.3 (S2 AC 1)
+Proof: run unit | ✔ S2.06 v1 aceita booleano
 
 ### S3 - IDs guiados na versão 2
 
@@ -152,6 +158,9 @@ Proof: run unit | ✔ S5.04 publish.yml usa
 **C38** - O pacote mantém o nome `n8n-nodes-digisac` (porta do nome no Landing)
 Proof: run unit | ✔ S5.06 o pacote mantém o nome
 
+**C47** - A seção "Usar como Tool de Agente de IA" do README tem o passo a passo, a assinatura do `$fromAI`, exemplos com campos reais do node (`Text`, `Contact Id`, `Start Period`) e as referências (S5 AC 2)
+Proof: run unit | ✔ S5.07 README ensina
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -185,6 +194,7 @@ Proof: run unit | ✔ S5.06 o pacote mantém o nome
 
 - **Settled mid-build:** none
 - **Dispatched:** Verifier (sonnet) no HEAD e1aae30, rodada 1: returned (FAIL, 11 achados, fechados em a3e9cd2)
-- **Boundary:** C1-C44 fechados em a3e9cd2
+- **Dispatched (revisor independente):** the-judge, rodada 1 no HEAD a5f7eb6: https://github.com/PedroHSGuimaraes/n8n-nodes-digisac/pull/1#pullrequestreview-5807156544 (1 bloqueador, 1 correção, 3 notas); C45-C47 fecham F1 e F2
+- **Boundary:** C1-C44 fechados em a3e9cd2; C45-C47 fecham os achados F1 e F2 do revisor
 - **Abandoned:** none
 - **Pending (fora do brief):** S5 AC 5, a tag `v1.1.0` e a aprovação do npm; o brief proíbe tag e publicação, então o dono cria a tag depois do merge

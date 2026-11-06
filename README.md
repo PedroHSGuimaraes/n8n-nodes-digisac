@@ -253,7 +253,38 @@ Em **Body Fields**, preencha `Active`, `Name`, `Url`, `Events` e `Type`. Para `E
 
 ## 🤖 Usar como Tool de Agente de IA
 
-O node pode ser conectado ao **AI Agent** do n8n como uma tool. A prática recomendada é criar uma tool por operação liberada para o agente. Isso limita o escopo do modelo e reduz risco de ações erradas.
+O node `Digisac` é **usável como tool** por nós de **AI Agent** do n8n (Tools Agent). Isso deixa o modelo **executar ações no Digisac sozinho** — por exemplo: *"busque o contato do número 5511999998888 e envie a ele a mensagem de boas-vindas"*. A prática recomendada é criar uma tool por operação liberada para o agente. Isso limita o escopo do modelo e reduz risco de ações erradas.
+
+### Como ligar (2 passos)
+
+1. **No servidor n8n**, habilite o uso de community nodes como tools (por segurança, vem **desligado por padrão**). Defina a variável de ambiente:
+
+   ```bash
+   N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+   ```
+
+   | Instalação | Onde definir |
+   | --- | --- |
+   | **Docker / docker-compose** | Adicione em `environment:` do serviço n8n (ou no `.env`) e recrie o container (`docker compose up -d`). |
+   | **npm / npx** | Exporte antes de subir: `export N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true && n8n start`. |
+   | **n8n Cloud** | Já habilitado nos planos que suportam community nodes. |
+
+   Sem essa variável o node **não aparece** na lista de tools do AI Agent — é a causa nº 1 de "não acho o node como tool".
+
+2. **No workflow**, adicione um node **AI Agent**, conecte um **Chat Model** e, no conector **Tool**, adicione o **Digisac**. Escolha o **Resource** e a **Operation** que o agente pode usar (ex.: *Contatos (General)* → *Listar todos os contatos*). Crie uma tool por operação.
+
+### Deixe o modelo preencher os campos (`$fromAI`)
+
+Em cada campo do node em modo tool aparece o botão **"Let the model define this parameter"**, que usa a expressão:
+
+```javascript
+{{ $fromAI('text', 'Texto exato que será enviado ao contato', 'string') }}
+```
+
+- Assinatura: `$fromAI(key, description?, type?, defaultValue?)` — `key` de 1–64 caracteres (`[a-zA-Z0-9_-]`); `type` = `string` | `number` | `boolean` | `json`.
+- Você pode **misturar**: fixar alguns campos (ex.: sempre `Origin` = `bot`) e deixar o modelo preencher outros (texto, contato, período).
+- **Na versão 2 do node**, os campos de ID são Resource Locator. Para o modelo preencher um ID, mude o campo para o modo **By ID** e ponha a expressão `$fromAI` no valor. A lista **From List** serve para a pessoa que monta o workflow, não para o agente.
+- As **descrições de cada operação e campo** foram escritas para o LLM entender o que cada uma faz e como preencher; quanto mais específico o System Message do agente, melhor o resultado.
 
 ### Prompt recomendado para o System Message
 
@@ -269,27 +300,35 @@ Para exportações CSV, TXT ou PDF, use Response Format = Text se a resposta nã
 Antes de criar, editar, excluir, arquivar, bloquear, fechar chamado ou enviar mensagem, confirme que a intenção do usuário está clara.
 ```
 
-### Exemplos de `$fromAI()`
+### Exemplos de `$fromAI()` com os campos do node
 
-Contato existente:
+**Enviar mensagem** (*Mensagens (General)* → *Enviar mensagem*), em **Body Fields**:
 
-```javascript
-{{ $fromAI('contactId', 'ID existente de contato Digisac. Deve vir de uma busca/listagem anterior, nunca inventado.', 'string') }}
-```
+- `Text`: o modelo escreve o texto.
 
-Texto de mensagem:
+  ```javascript
+  {{ $fromAI('text', 'Texto exato que será enviado ao contato no WhatsApp/Digisac.', 'string') }}
+  ```
 
-```javascript
-{{ $fromAI('messageText', 'Texto exato que será enviado ao contato no WhatsApp/Digisac.', 'string') }}
-```
+- `Contact Id` (modo **By ID**): o ID vem de uma busca anterior, nunca inventado.
 
-Filtro de período:
+  ```javascript
+  {{ $fromAI('contactId', 'ID existente de contato Digisac. Deve vir de uma busca/listagem anterior.', 'string') }}
+  ```
 
-```javascript
-{{ $fromAI('startPeriod', 'Início do período em ISO-8601, por exemplo 2026-07-01T00:00:00.000Z.', 'string') }}
-```
+- `Type` = `chat` e `Origin` = `bot`: fixe estes dois no próprio campo, sem `$fromAI`.
 
-Campo de body estruturado:
+**Buscar estatísticas** (*Estatísticas de atendimento (General)*), nos campos de query:
+
+- `Start Period` e `End Period`: o seletor de data da versão 2 aceita a expressão.
+
+  ```javascript
+  {{ $fromAI('startPeriod', 'Início do período em ISO-8601 com fuso, por exemplo 2026-07-01T00:00:00.000Z.', 'string') }}
+  ```
+
+- `Department Id` e `User Id`: deixe `all` fixo quando o agente não precisa filtrar.
+
+**Campo de body estruturado** (envio de arquivo, `File` em *Body Fields*):
 
 ```javascript
 {{ $fromAI('file', 'Objeto JSON do arquivo com base64, mimetype e name quando a operação Digisac enviar mídia.', 'json') }}
@@ -304,6 +343,12 @@ Campo de body estruturado:
 - Para operações destrutivas (`DELETE`, arquivar, bloquear, fechar chamado), coloque etapa humana de confirmação quando o fluxo for sensível.
 - Em mensagens enviadas ao cliente, gere o texto em etapa anterior e passe o texto final para a tool.
 - Use campos dedicados sempre que existirem. Para bodies grandes ou arrays de múltiplos itens, use JSON explícito e valide campos obrigatórios no workflow antes da chamada.
+
+### Referências
+
+- [Tools Agent — n8n Docs](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/tools-agent)
+- [Let AI specify tool parameters (`$fromAI`) — n8n Docs](https://docs.n8n.io/advanced-ai/examples/using-the-fromai-function/)
+- [Variáveis de ambiente de nodes — n8n Docs](https://docs.n8n.io/hosting/configuration/environment-variables/nodes/)
 
 ## 🔀 Versão 1 ou 2 do node
 
