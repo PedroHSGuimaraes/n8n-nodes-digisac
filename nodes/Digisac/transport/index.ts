@@ -9,6 +9,10 @@ import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 import { trimTrailingSlash } from '../helpers/format';
 
+// Tempo máximo de espera por resposta do Digisac, em milissegundos. 30 s cobre exportações
+// (CSV/PDF) sem prender o workflow para sempre se o serviço travar.
+export const DIGISAC_REQUEST_TIMEOUT_MS = 30000;
+
 export type DigisacResponseFormat = 'json' | 'text';
 
 export interface DigisacRequestConfig {
@@ -53,6 +57,8 @@ export async function digisacApiRequest(
 		qs,
 		body,
 		json: responseFormat === 'json',
+		// Sem timeout, uma chamada pendurada travaria o item do workflow indefinidamente.
+		timeout: DIGISAC_REQUEST_TIMEOUT_MS,
 	};
 
 	if (!config.absoluteUrl) {

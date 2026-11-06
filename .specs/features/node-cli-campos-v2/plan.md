@@ -96,7 +96,7 @@ Workflow salvo na versão 1 envia exatamente a mesma requisição da 1.0.3.
 **Acceptance Criteria**
 
 1. WHEN o `execute` roda com `typeVersion` 1, `operation` `e001`, `path_e001_botId` `'b1'`, `path_e001_contactId` `'c1'` e `queryKey_e001_flag` `'flagAqui'` THEN o sistema SHALL chamar `POST` em `/api/v1/bots/b1/trigger-signal/c1` com `qs` `{ flag: 'flagAqui' }`, base da credencial `digisacApi` e `timeout` definido
-   - `path_e001_contactId` com espaço nas pontas `' c1 '` → rota usa `c1` codificado, igual à 1.0.3
+   - `path_e001_contactId` com espaço nas pontas `' c1 '` → rota usa `%20c1%20`, sem limpar o espaço, igual à 1.0.3 (corrigido na construção: a 1.0.3 só codifica o texto)
 2. IF `path_e001_contactId` chega vazio na versão 1 THEN o sistema SHALL lançar `NodeOperationError` com a mensagem `Missing required path parameter for POST /api/v1/bots/{{botId}}/trigger-signal/{{contactId}}`
 3. The node SHALL listar, para `@version` 1, todo parâmetro com o mesmo `name` e o mesmo `type` da 1.0.3, para as 298 operações
 4. WHEN `executeEndpoint` roda com `Response Format` `Text` THEN o sistema SHALL devolver `{ data: <texto> }`, igual à 1.0.3
