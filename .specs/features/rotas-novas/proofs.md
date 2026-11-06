@@ -1,6 +1,6 @@
 # rotas-novas proofs
 
-**HEAD**: f466213
+**HEAD**: 718decf
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 44 pass, 0 fail
@@ -57,13 +57,13 @@
 `Run unit` - exit 0
 
 ```
-  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (1.798173ms)
-  ✔ S2.02 v1 vazio lança erro de parâmetro de path (2.129085ms)
-  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (3.112569ms)
-  ✔ S2.04 formato texto devolve data com o texto (1.388915ms)
-  ✔ S2.05 v1 envia número e booleano de campo de query como texto (4.044373ms)
-  ✔ S2.06 v1 aceita booleano em ID de path como a 1.0.3 (2.246317ms)
-✔ versão 1 do node (20.033891ms)
+  ✔ S2.01b v1 com espaço nas pontas não limpa o valor (1.624471ms)
+  ✔ S2.02 v1 vazio lança erro de parâmetro de path (2.61248ms)
+  ✔ S2.03 v1 mantém name e type de todo parâmetro da 1.0.3 (3.746737ms)
+  ✔ S2.04 formato texto devolve data com o texto (1.652777ms)
+  ✔ S2.05 v1 envia número e booleano de campo de query como texto (4.811747ms)
+  ✔ S2.06 v1 aceita booleano em ID de path como a 1.0.3 (3.05039ms)
+✔ versão 1 do node (23.285567ms)
 ℹ tests 87
 ℹ suites 13
 ℹ pass 87
@@ -71,5 +71,5 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 848.374444
+ℹ duration_ms 984.197712
 ```
