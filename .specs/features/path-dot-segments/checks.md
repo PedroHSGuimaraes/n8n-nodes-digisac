@@ -68,6 +68,6 @@ Proof: run unit | ℹ fail 0
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** none
-- **Boundary:** nothing closed yet
+- **Dispatched:** Verifier (sonnet) no HEAD e1e8d74, intervalo origin/main..HEAD - sent
+- **Boundary:** C1-C6 verdes em check_proofs em e1e8d74
 - **Abandoned:** none
