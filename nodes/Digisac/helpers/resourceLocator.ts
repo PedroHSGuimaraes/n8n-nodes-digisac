@@ -14,7 +14,6 @@
  * viram Resource Locator só com o modo `id`, para o valor ter o mesmo formato em todo o node.
  */
 import type {
-	DisplayCondition,
 	IDisplayOptions,
 	IExecuteFunctions,
 	INodeProperties,
@@ -23,6 +22,8 @@ import type {
 import { NodeOperationError } from 'n8n-workflow';
 
 import { toTitle } from './format';
+import { guideBodyChild } from './valoresGuiados';
+import { FROM_VERSION_2, withVersion } from './versao';
 
 /** Descreve um tipo de ID que tem lista pesquisável. */
 interface ListedIdType {
@@ -46,20 +47,6 @@ export const LISTED_ID_TYPES: Record<string, ListedIdType> = {
 	botId: { noun: 'bot', search: 'searchBots' },
 	ticketTopicId: { noun: 'ticket topic', search: 'searchTicketTopics' },
 };
-
-/** Faixa de `@version` aceita pelo n8n: números exatos ou condições como `{ _cnd: { gte: 2 } }`. */
-type VersionRange = Array<number | DisplayCondition>;
-
-/** A cópia guiada aparece da versão 2 em diante. */
-const FROM_VERSION_2: VersionRange = [{ _cnd: { gte: 2 } }];
-
-/** Copia as regras de exibição do campo e prende o campo à faixa de versões. */
-export function withVersion(
-	displayOptions: IDisplayOptions | undefined,
-	versions: VersionRange,
-): IDisplayOptions {
-	return { ...displayOptions, show: { ...displayOptions?.show, '@version': versions } };
-}
 
 /** Padrões de nome gerados por `actions/index.ts` (prefixo, id da operação e parâmetro). */
 const PATH_NAME = /^path_e\d+_(.+)$/;
@@ -158,9 +145,14 @@ export function withGuidedIds(properties: INodeProperties[]): INodeProperties[] 
 /** Copia uma coleção de Campos do Body e troca os filhos de ID por Resource Locator na cópia v2. */
 function guideBodyCollection(collection: INodeProperties): INodeProperties[] {
 	const options = (collection.options ?? []) as INodeProperties[];
-	if (!options.some((child) => BODY_ID_KEYS.has(child.name))) return [collection];
+	// A coleção ganha cópia da versão 2 quando tem algum ID ou o campo origin para guiar.
+	if (!options.some((child) => BODY_ID_KEYS.has(child.name) || guideBodyChild(child))) {
+		return [collection];
+	}
 
 	const guidedChildren = options.map((child) => {
+		const valor = guideBodyChild(child);
+		if (valor) return valor;
 		if (!BODY_ID_KEYS.has(child.name)) return child;
 		return listedLocator(
 			child,

@@ -24,6 +24,7 @@ import {
 	toTitle,
 } from '../helpers/format';
 import { getIdParameter, plainValue } from '../helpers/resourceLocator';
+import { guideQueryField, isDateQueryKey, toIsoDate } from '../helpers/valoresGuiados';
 import { digisacApiRequest, type DigisacResponseFormat } from '../transport';
 
 type QueryEntry = {
@@ -404,15 +405,19 @@ function queryFieldProperties(): INodeProperties[] {
 	const simpleFields: INodeProperties[] = DIGISAC_ENDPOINTS.flatMap((endpoint) =>
 		(queryEntriesByOperation.get(endpoint.id) ?? [])
 			.filter((entry) => entry.showField)
-			.map((entry): INodeProperties => ({
-				displayName: entry.displayName,
-				name: entry.field,
-				type: 'string',
-				default: queryDefault(entry),
-				placeholder: queryPlaceholder(entry),
-				displayOptions: { show: { operation: [endpoint.id] } },
-				description: `Parametro de query opcional "${entry.key}" para ${endpoint.method} ${endpoint.pathTemplate}. Template documentado: "${compactDescription(entry.value || '(valor livre)', 120)}". Deixe vazio para omitir. ${querySpecificGuidance(entry)} Nao copie placeholders da documentacao; substitua por valor real.`,
-			})),
+			.flatMap((entry): INodeProperties[] => {
+				const field: INodeProperties = {
+					displayName: entry.displayName,
+					name: entry.field,
+					type: 'string',
+					default: queryDefault(entry),
+					placeholder: queryPlaceholder(entry),
+					displayOptions: { show: { operation: [endpoint.id] } },
+					description: `Parametro de query opcional "${entry.key}" para ${endpoint.method} ${endpoint.pathTemplate}. Template documentado: "${compactDescription(entry.value || '(valor livre)', 120)}". Deixe vazio para omitir. ${querySpecificGuidance(entry)} Nao copie placeholders da documentacao; substitua por valor real.`,
+				};
+				// Datas e valores fixos ganham a cópia guiada da versão 2; os demais campos passam iguais.
+				return guideQueryField(field, entry.key, enumChoicesFromValue(entry.value));
+			}),
 	);
 
 	const complexPlaceholderFields: INodeProperties[] = DIGISAC_ENDPOINTS.flatMap((endpoint) => {
@@ -821,11 +826,18 @@ function buildSimpleQueryValue(
 	const configuredValue = plainValue(node.getNodeParameter(entry.field, i, queryDefault(entry)));
 	if (configuredValue === '') return undefined;
 
+	// Na versão 2 o seletor de data entrega um texto de data; a API recebe o ISO em UTC.
+	// Na versão 1 o texto segue como a pessoa digitou (igual à 1.0.3).
+	const value =
+		node.getNode().typeVersion >= 2 && isDateQueryKey(entry.key)
+			? toIsoDate(node, configuredValue, entry.displayName, i)
+			: configuredValue;
+
 	if (entry.variables.length === 1) {
-		return replaceTemplateValues(entry.value, { [entry.variables[0]]: configuredValue });
+		return replaceTemplateValues(entry.value, { [entry.variables[0]]: value });
 	}
 
-	return configuredValue;
+	return value;
 }
 
 function buildComplexQueryValue(
