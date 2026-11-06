@@ -122,6 +122,13 @@ describe('seletores do Kanban', () => {
 		assert.equal(puro.resultado.paginationToken, undefined);
 	});
 
+	it('K4.02b item nulo ou sem id fica fora da lista de quadros', async () => {
+		const { resultado } = await buscar('searchKanbanBoards', {}, '', () => ({
+			data: [null, { name: 'Sem id' }, { id: 'b1', name: 'Vendas' }],
+		}));
+		assert.deepEqual(resultado.results, [{ name: 'Vendas', value: 'b1' }]);
+	});
+
 	it('K4.03 a lista de colunas filtra pelo quadro do campo auxiliar', async () => {
 		const colunas = [{ id: 'c1', name: 'Novos' }];
 		const com = await buscar(
@@ -183,6 +190,10 @@ describe('seletores do Kanban', () => {
 			assert.equal(visivelNa(campos[0], 1), false);
 		}
 		// Operações sem coluna ou card não ganham campo auxiliar.
+		// filterColumn_ existe só onde há card; as demais (inclusive as que só pedem coluna) não o têm.
+		for (const operacao of ['e305', 'e307', 'e308', 'e309', 'e310', 'e312']) {
+			assert.equal(propriedades.filter((p) => p.name === `filterColumn_${operacao}`).length, 0, operacao);
+		}
 		for (const operacao of ['e299', 'e300', 'e301', 'e302', 'e303', 'e304', 'e306']) {
 			assert.equal(propriedades.filter((p) => p.name === `filterBoard_${operacao}`).length, 0, operacao);
 			assert.equal(propriedades.filter((p) => p.name === `filterColumn_${operacao}`).length, 0, operacao);

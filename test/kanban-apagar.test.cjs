@@ -148,9 +148,14 @@ describe('apagar com confirmação', () => {
 				endpoint.id,
 			);
 		}
-		// Uma DELETE antiga continua saindo sem o campo (versão 1, como a 1.1.0).
-		const antiga = outras.find((e) => e.pathParams.length === 1);
-		const { req } = await executar(1, { operation: antiga.id, [`path_${antiga.id}_${antiga.pathParams[0]}`]: 'x1' });
-		assert.equal(req.method, 'DELETE');
+		// Toda DELETE antiga continua saindo sem confirmação, na versão 1 e na 2.
+		for (const antiga of outras) {
+			const parametros = { operation: antiga.id };
+			for (const p of antiga.pathParams) parametros[`path_${antiga.id}_${p}`] = 'x1';
+			for (const versao of [1, 2]) {
+				const { req } = await executar(versao, parametros);
+				assert.equal(req.method, 'DELETE', `${antiga.id} v${versao}`);
+			}
+		}
 	});
 });

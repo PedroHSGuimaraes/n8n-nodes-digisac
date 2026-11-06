@@ -127,6 +127,7 @@ Proof: run unit | ✔ K4.07 a versão 2 lê list e id
 
 **C36** - Na versão 1, todo parâmetro das 298 operações antigas mantém `name` e `type`, e as 17 novas aparecem com texto (S5 AC 1)
 Proof: run unit | ✔ K5.01 a versão 1 vê as operações novas
+Proof: run unit | ✔ S2.03 v1 mantém name e type
 
 **C37** - O `package.json` está em `1.2.0` e o `CHANGELOG.md` tem a seção `## 1.2.0` (S5 AC 2)
 Proof: run unit | ✔ K5.02 versão e changelog

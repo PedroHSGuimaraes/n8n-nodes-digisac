@@ -110,6 +110,18 @@ describe('catálogo do Kanban', () => {
 			],
 		).map((e) => e.id);
 		assert.deepEqual(dupla, ['e005', 'e006']);
+		// Mesma URL com método diferente ou pasta diferente é outra rota: não herda o ID da vizinha.
+		const mesmaUrl = { rawUrl: '{{URL}}/api/v1/u', sourcePath: 'Gerais > u' };
+		const porMetodo = reuseIds(
+			[{ id: 'e001', method: 'DELETE', ...mesmaUrl }],
+			[{ id: 'e007', method: 'GET', ...mesmaUrl }],
+		).map((e) => e.id);
+		assert.deepEqual(porMetodo, ['e008']);
+		const porPasta = reuseIds(
+			[{ id: 'e001', method: 'GET', rawUrl: mesmaUrl.rawUrl, sourcePath: 'Populares > u' }],
+			[{ id: 'e007', method: 'GET', ...mesmaUrl }],
+		).map((e) => e.id);
+		assert.deepEqual(porPasta, ['e008']);
 	});
 
 	it('K1.04 as 17 rotas do Kanban têm método e caminho da documentação', () => {

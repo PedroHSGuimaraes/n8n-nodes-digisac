@@ -882,7 +882,8 @@ function buildComplexQueryValue(
 		const raw = node.getNodeParameter(fieldName('query', endpoint.id, variable), i, '') as unknown;
 		// Na versão 2 do Kanban o quadro e a coluna chegam como Resource Locator; texto passa como está.
 		const value = typeof raw === 'object' && raw !== null ? plainValue(raw) : (raw as string);
-		if (value !== '') {
+		// No Kanban, texto só com espaços conta como vazio: não vira `userIds:["  "]` na query.
+		if (isKanbanEndpoint(endpoint) ? String(value).trim() !== '' : value !== '') {
 			values[variable] = value;
 		}
 	}

@@ -193,6 +193,15 @@ describe('operações do Kanban', () => {
 		assert.equal(nenhum.req.qs.query, `{${base}}`);
 	});
 
+	it('K2.10b usuário só com espaços não entra na query de listar cards', async () => {
+		const { req } = await v2({
+			operation: 'e310',
+			query_e310_columnId: lista('c1'),
+			query_e310_userId: '   ',
+		});
+		assert.equal(req.qs.query, '{"where":{"columnId":"c1"},"paginate":false,"withTotal":false}');
+	});
+
 	it('K2.11 buscar card chama o caminho com o ID', async () => {
 		const { req } = await v2({ operation: 'e311', path_e311_cardId: lista('k1') });
 		assert.equal(req.method, 'GET');
@@ -230,11 +239,21 @@ describe('operações do Kanban', () => {
 		const { req } = await v2({
 			operation: 'e315',
 			path_e315_cardId: lista('k1'),
-			bodyFields_e315_fields: { beforeCardId: lista('k0'), columnId: lista('c2'), moveTo: 'top' },
+			bodyFields_e315_fields: {
+				beforeCardId: lista('k0'),
+				afterCardId: lista('k2'),
+				columnId: lista('c2'),
+				moveTo: 'top',
+			},
 		});
 		assert.equal(req.method, 'PATCH');
 		assert.equal(req.url, '/api/v1/kanban-cards/k1/reorder');
-		assert.deepEqual(req.body, { beforeCardId: 'k0', columnId: 'c2', moveTo: 'top' });
+		assert.deepEqual(req.body, {
+			beforeCardId: 'k0',
+			afterCardId: 'k2',
+			columnId: 'c2',
+			moveTo: 'top',
+		});
 	});
 
 	it('K2.15 ID de path vazio lança o erro do campo certo', async () => {
@@ -254,13 +273,14 @@ describe('operações do Kanban', () => {
 
 	it('K2.16 erros do Digisac viram NodeApiError com o código HTTP', async () => {
 		// Uma operação de cada método (GET, POST, PUT, PATCH, DELETE) e cada status do Surface.
-		const operacoes = [
-			['e299', {}],
-			['e301', { bodyFields_e301_fields: { name: 'X' } }],
-			['e302', { path_e302_boardId: lista('b1') }],
-			['e309', { path_e309_columnId: lista('c1') }],
-			['e314', { path_e314_cardId: lista('k1'), confirmDelete_e314: true }],
-		];
+		// Todas as 17 operações, cada uma com o ID de path e a confirmação que ela pede.
+		const operacoes = KANBAN.map(([id, , caminho]) => {
+			const extra = {};
+			const parametro = /\{\{(\w+)\}\}/.exec(caminho)?.[1];
+			if (parametro) extra[`path_${id}_${parametro}`] = lista('x1');
+			if (id === 'e303' || id === 'e308' || id === 'e314') extra[`confirmDelete_${id}`] = true;
+			return [id, extra];
+		});
 		for (const status of ['401', '404']) {
 			for (const [operacao, extra] of operacoes) {
 				const falha = () => {

@@ -92,20 +92,28 @@ describe('compatibilidade e documentação', () => {
 		assert.equal(pacote.version, '1.2.0');
 		const changelog = fs.readFileSync(path.join(raiz, 'CHANGELOG.md'), 'utf8');
 		assert.match(changelog, /^## 1\.2\.0/m);
-		assert.match(changelog, /Kanban/);
+		// A seção 1.2.0 (e só ela) cita as 17 operações, os IDs estáveis e a confirmação de apagar.
+		const secao = changelog.split(/^## /m).find((bloco) => bloco.startsWith('1.2.0'));
+		assert.match(secao, /17 operações/);
+		assert.match(secao, /e299/);
+		assert.match(secao, /Confirm Delete/);
 	});
 
 	it('K5.03 o README documenta o Kanban', () => {
 		const readme = fs.readFileSync(path.join(raiz, 'README.md'), 'utf8');
 		for (const [, , , nome] of KANBAN) assert.ok(readme.includes(nome), `README sem "${nome}"`);
-		assert.match(readme, /Confirm Delete/);
-		assert.match(readme, /mover.*card|Move a card/i);
-		assert.match(readme, /Tool de Agente de IA|Tool de IA/);
+		// Cada parte fica na seção certa do README, não solta em qualquer linha.
+		const secao = (titulo) => readme.split(/^#{2,3} /m).find((b) => b.startsWith(titulo)) ?? '';
+		assert.match(secao('Kanban (quadros'), /Confirm Delete/);
+		assert.match(secao('Mover card entre colunas'), /Editar card/);
+		assert.match(secao('Excluir card com confirmação'), /Confirm Delete/);
+		assert.match(secao('Boas práticas para LLMs'), /Kanban como tool/);
 	});
 
 	it('K5.04 a documentação gerada lista 315 chamadas', () => {
 		const docs = fs.readFileSync(path.join(raiz, 'docs/api-calls.md'), 'utf8');
-		assert.match(docs, /315/);
+		// A linha de total do cabeçalho, e não um ID como e315 solto na tabela.
+		assert.match(docs, /Total de chamadas documentadas: 315/);
 		assert.match(docs, /kanban-boards/);
 		const readme = fs.readFileSync(path.join(raiz, 'README.md'), 'utf8');
 		// O README escrito à mão sobrevive: a seção de Desenvolvimento continua lá.

@@ -149,9 +149,10 @@ function kanbanSearch(
 			query: JSON.stringify(query),
 		});
 		const needle = normalize(filter ?? '');
-		const items = extractItems(response).filter(
-			(item) => !needle || normalize(label(item)).includes(needle),
-		);
+		// Item nulo ou sem `id` não pode virar opção ("undefined" como valor); a resposta não é documentada.
+		const items = extractItems(response)
+			.filter((item) => item && item.id !== undefined && item.id !== null)
+			.filter((item) => !needle || normalize(label(item)).includes(needle));
 		return { results: items.map((item) => ({ name: label(item), value: String(item.id) })) };
 	};
 }
